@@ -1,0 +1,2215 @@
+{
+  "schema": "pitwall.v1",
+  "seq": 42,
+  "mode": "live",
+  "scenario": null,
+  "scenario_note": "",
+  "generated_at": "2026-11-08T03:42:46.409Z",
+  "overall": {
+    "state": "active",
+    "headline": "serving, work active",
+    "reason": "2 seats occupied"
+  },
+  "exception": {
+    "level": "service",
+    "text": "Aspire unreachable now (task history unaffected)",
+    "source": "flow-top"
+  },
+  "sources": [
+    {
+      "id": "fleet",
+      "label": "fleet-top",
+      "state": "active",
+      "path": "/dev/shm/fleet-top-snapshot.json",
+      "observed_at": "2026-11-08T03:42:43.409Z",
+      "read_at": "2026-11-08T03:42:46.409Z",
+      "age_s": 3,
+      "stale_after_s": 6,
+      "last_error": ""
+    },
+    {
+      "id": "flow",
+      "label": "flow-top",
+      "state": "active",
+      "path": "/dev/shm/flow-top-snapshot.json",
+      "observed_at": "2026-11-08T03:42:41.409Z",
+      "read_at": "2026-11-08T03:42:46.409Z",
+      "age_s": 5,
+      "stale_after_s": 10,
+      "last_error": ""
+    }
+  ],
+  "hosts": [
+    {
+      "id": "omen",
+      "label": "OMEN",
+      "role": "2x B70 32G",
+      "state": "active"
+    },
+    {
+      "id": "am4",
+      "label": "AM4",
+      "role": "TP2 seat",
+      "state": "active"
+    },
+    {
+      "id": "fx99",
+      "label": "FX99",
+      "role": "RTX 2070 SUPER",
+      "state": "stale"
+    }
+  ],
+  "devices": [
+    {
+      "id": "b70-0",
+      "host_id": "omen",
+      "title": "B70#0",
+      "hardware": "Intel Arc Pro B70",
+      "mode": "serving",
+      "workload": "qwen3-27b dense seat",
+      "owner": "hearth",
+      "state": "active",
+      "utilization": {
+        "value": 63,
+        "unit": "%",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_used": {
+        "value": 25.3,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_total": {
+        "value": 32,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power": {
+        "value": 148,
+        "unit": "W",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power_limit": {
+        "value": 230,
+        "unit": "W",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_core": {
+        "value": 61,
+        "unit": "C",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_mem": {
+        "value": 66,
+        "unit": "C",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "link": ""
+    },
+    {
+      "id": "b70-1",
+      "host_id": "omen",
+      "title": "B70#1",
+      "hardware": "Intel Arc Pro B70",
+      "mode": "serving",
+      "workload": "qwen3-27b dense seat (b)",
+      "owner": "hearth",
+      "state": "idle",
+      "utilization": {
+        "value": 0,
+        "unit": "%",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_used": {
+        "value": 24.9,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_total": {
+        "value": 32,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power": {
+        "value": 41,
+        "unit": "W",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power_limit": {
+        "value": 230,
+        "unit": "W",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_core": {
+        "value": 47,
+        "unit": "C",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_mem": {
+        "value": 51,
+        "unit": "C",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "link": ""
+    },
+    {
+      "id": "am4-0",
+      "host_id": "am4",
+      "title": "AM4#0 RTX 5070",
+      "hardware": "RTX 5070 12G",
+      "mode": "serving",
+      "workload": "TP2 seat :18094",
+      "owner": "hearth",
+      "state": "active",
+      "utilization": {
+        "value": 88,
+        "unit": "%",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_used": {
+        "value": 10.3,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_total": {
+        "value": 12,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power": {
+        "value": 201,
+        "unit": "W",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power_limit": {
+        "value": 250,
+        "unit": "W",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_core": {
+        "value": 67,
+        "unit": "C",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_mem": {
+        "value": 70,
+        "unit": "C",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "link": ""
+    },
+    {
+      "id": "am4-1",
+      "host_id": "am4",
+      "title": "AM4#1 RTX 4070 Ti",
+      "hardware": "RTX 4070 Ti 12G",
+      "mode": "serving",
+      "workload": "TP2 seat :18094",
+      "owner": "hearth",
+      "state": "active",
+      "utilization": {
+        "value": 84,
+        "unit": "%",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_used": {
+        "value": 10.1,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_total": {
+        "value": 12,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power": {
+        "value": 176,
+        "unit": "W",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power_limit": {
+        "value": 285,
+        "unit": "W",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_core": {
+        "value": 64,
+        "unit": "C",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_mem": {
+        "value": null,
+        "unit": "C",
+        "observed_at": null,
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "unknown",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "link": ""
+    },
+    {
+      "id": "fx99-0",
+      "host_id": "fx99",
+      "title": "FX99#0 RTX 2070 SUPER",
+      "hardware": "RTX 2070 SUPER 8G",
+      "mode": "idle",
+      "workload": "",
+      "owner": "",
+      "state": "stale",
+      "utilization": {
+        "value": 7,
+        "unit": "%",
+        "observed_at": "2026-11-08T03:42:12.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "stale",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_used": {
+        "value": 1.2,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:12.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "stale",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "memory_total": {
+        "value": 8,
+        "unit": "GiB",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power": {
+        "value": null,
+        "unit": "W",
+        "observed_at": null,
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "unknown",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "power_limit": {
+        "value": 215,
+        "unit": "W",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_core": {
+        "value": null,
+        "unit": "C",
+        "observed_at": null,
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "unknown",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "temp_mem": {
+        "value": null,
+        "unit": "C",
+        "observed_at": null,
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "unknown",
+        "scope": "device",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "link": ""
+    }
+  ],
+  "seats": [
+    {
+      "id": "omen-dense-27b",
+      "host_id": "omen",
+      "label": "omen-dense-27b",
+      "model": "qwen3-27b GPTQ",
+      "state": "active",
+      "health": "healthy",
+      "occupancy": {
+        "value": 3,
+        "unit": "reqs",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:hearth",
+        "status": "ok",
+        "scope": "engine_lifetime",
+        "window": null,
+        "numerator": 3,
+        "denominator": 8,
+        "note": ""
+      },
+      "queued": {
+        "value": 0,
+        "unit": "reqs",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "host",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "generation_rate": {
+        "value": 41.6,
+        "unit": "tok/s",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "host",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "context_tokens": 49152,
+      "device_ids": [
+        "b70-0"
+      ]
+    },
+    {
+      "id": "omen-dense-27b-b",
+      "host_id": "omen",
+      "label": "omen-dense-27b-b",
+      "model": "qwen3-27b GPTQ",
+      "state": "idle",
+      "health": "healthy",
+      "occupancy": {
+        "value": 0,
+        "unit": "reqs",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:hearth",
+        "status": "ok",
+        "scope": "engine_lifetime",
+        "window": null,
+        "numerator": 0,
+        "denominator": 8,
+        "note": ""
+      },
+      "queued": {
+        "value": 0,
+        "unit": "reqs",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "host",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "generation_rate": {
+        "value": 0,
+        "unit": "tok/s",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "host",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "context_tokens": 49152,
+      "device_ids": [
+        "b70-1"
+      ]
+    },
+    {
+      "id": "fx99-util",
+      "host_id": "fx99",
+      "label": "fx99-util",
+      "model": "qwen2.5-coder-7b",
+      "state": "idle",
+      "health": "healthy",
+      "occupancy": {
+        "value": 0,
+        "unit": "reqs",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:hearth",
+        "status": "ok",
+        "scope": "engine_lifetime",
+        "window": null,
+        "numerator": 0,
+        "denominator": 4,
+        "note": ""
+      },
+      "queued": {
+        "value": 0,
+        "unit": "reqs",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "host",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "generation_rate": {
+        "value": 0,
+        "unit": "tok/s",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "host",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "context_tokens": 49152,
+      "device_ids": [
+        "fx99-0"
+      ]
+    },
+    {
+      "id": "am4-vllm",
+      "host_id": "am4",
+      "label": "am4-vllm (TP2)",
+      "model": "qwen3-27b GPTQ",
+      "state": "active",
+      "health": "healthy",
+      "occupancy": {
+        "value": 2,
+        "unit": "reqs",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:hearth",
+        "status": "ok",
+        "scope": "engine_lifetime",
+        "window": null,
+        "numerator": 2,
+        "denominator": 8,
+        "note": ""
+      },
+      "queued": {
+        "value": 1,
+        "unit": "reqs",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "host",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "generation_rate": {
+        "value": 96.3,
+        "unit": "tok/s",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "ok",
+        "scope": "host",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": ""
+      },
+      "context_tokens": 49152,
+      "device_ids": [
+        "am4-0",
+        "am4-1"
+      ]
+    }
+  ],
+  "services": [
+    {
+      "id": "aspire",
+      "name": "Aspire dashboard",
+      "responsibility": "Traces and logs for Service Bus work",
+      "endpoint": "127.0.0.1:18888",
+      "state": "unreachable",
+      "detail": "connection refused",
+      "source": "flow-top",
+      "age_s": 6,
+      "link": {
+        "label": "Aspire trace",
+        "url": "http://127.0.0.1:18888",
+        "service_id": "aspire",
+        "enabled": false,
+        "reason": "Aspire unreachable now"
+      }
+    },
+    {
+      "id": "sb-explorer",
+      "name": "Service Bus Explorer API",
+      "responsibility": "Queue inspection",
+      "endpoint": "127.0.0.1:5001",
+      "state": "stale",
+      "detail": "API timing out; / answers 200",
+      "source": "flow-top",
+      "age_s": 41,
+      "link": {
+        "label": "Explorer",
+        "url": "http://127.0.0.1:5001",
+        "service_id": "sb-explorer",
+        "enabled": true,
+        "reason": ""
+      }
+    },
+    {
+      "id": "hearth",
+      "name": "HEARTH door",
+      "responsibility": "Routing and execution",
+      "endpoint": "127.0.0.1:8710",
+      "state": "active",
+      "detail": "healthy",
+      "source": "fleet-top",
+      "age_s": 3,
+      "link": null
+    },
+    {
+      "id": "jepa",
+      "name": "JEPA context slicer (NPU)",
+      "responsibility": "Context ranking on the NPU",
+      "endpoint": "127.0.0.1:18097",
+      "state": "idle",
+      "detail": "0 requests in flight",
+      "source": "fleet-top",
+      "age_s": 3,
+      "link": null
+    },
+    {
+      "id": "ontology",
+      "name": "Ontology UI",
+      "responsibility": "Concept definitions",
+      "endpoint": "127.0.0.1:5173",
+      "state": "active",
+      "detail": "answers 200",
+      "source": "flow-top",
+      "age_s": 7,
+      "link": {
+        "label": "Ontology UI",
+        "url": "http://127.0.0.1:5173",
+        "service_id": "ontology",
+        "enabled": true,
+        "reason": ""
+      }
+    },
+    {
+      "id": "otel",
+      "name": "OTel collector",
+      "responsibility": "Trace ingest",
+      "endpoint": "127.0.0.1:4317",
+      "state": "active",
+      "detail": "accepting spans",
+      "source": "flow-top",
+      "age_s": 7,
+      "link": null
+    },
+    {
+      "id": "duckdb-ui",
+      "name": "DuckDB shell",
+      "responsibility": "Read-only inspection",
+      "endpoint": "local file",
+      "state": "unknown",
+      "detail": "no probe",
+      "source": "flow-top",
+      "age_s": null,
+      "link": null
+    }
+  ],
+  "engine_caches": [
+    {
+      "id": "am4-vllm",
+      "label": "am4-vllm prefix",
+      "hit": {
+        "value": 0,
+        "unit": "%",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "vllm counters",
+        "status": "ok",
+        "scope": "engine_lifetime",
+        "window": null,
+        "numerator": 0,
+        "denominator": 0,
+        "note": "counters since engine start"
+      }
+    },
+    {
+      "id": "omen-dense-b",
+      "label": "omen-dense-27b-b prefix",
+      "hit": {
+        "value": null,
+        "unit": "%",
+        "observed_at": null,
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "vllm counters",
+        "status": "unknown",
+        "scope": "engine_lifetime",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": "counters unreadable"
+      }
+    },
+    {
+      "id": "omen-dense",
+      "label": "omen-dense-27b prefix",
+      "hit": {
+        "value": 94.2,
+        "unit": "%",
+        "observed_at": "2026-11-08T03:42:44.409Z",
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "vllm counters",
+        "status": "ok",
+        "scope": "engine_lifetime",
+        "window": null,
+        "numerator": 18840,
+        "denominator": 20000,
+        "note": ""
+      }
+    }
+  ],
+  "network": [
+    {
+      "id": "omen-am4",
+      "label": "OMEN-AM4 Network latency",
+      "latency": {
+        "value": null,
+        "unit": "ms",
+        "observed_at": null,
+        "read_at": "2026-11-08T03:42:46.409Z",
+        "source": "sample:fleet-top",
+        "status": "unknown",
+        "scope": "host",
+        "window": null,
+        "numerator": null,
+        "denominator": null,
+        "note": "unmeasured: fleet-top lists no probe and Pitwall does not invent one"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "relpack",
+      "title": "help-ontology-relpack-20261104: relationship pack for Solicitation",
+      "short_title": "relpack: Solicitation relationships",
+      "actor": "claude",
+      "host": "omen",
+      "stage": "Deliver",
+      "stages": [
+        {
+          "id": "submit",
+          "label": "Submit",
+          "state": "done"
+        },
+        {
+          "id": "route",
+          "label": "Route",
+          "state": "done"
+        },
+        {
+          "id": "generate",
+          "label": "Generate",
+          "state": "done"
+        },
+        {
+          "id": "check",
+          "label": "Check",
+          "state": "done"
+        },
+        {
+          "id": "review",
+          "label": "Review",
+          "state": "done"
+        },
+        {
+          "id": "deliver",
+          "label": "Deliver",
+          "state": "done"
+        }
+      ],
+      "latest_progress": "Parent consumed the delivered pack",
+      "latest_progress_at": "2026-11-08T03:38:00.409Z",
+      "outcome": {
+        "state": "completed",
+        "label": "completed",
+        "summary": "Pack delivered and consumed by the parent.",
+        "finished_at": "2026-11-08T03:21:46.409Z"
+      },
+      "checks": {
+        "state": "passed",
+        "detail": "9/9 required facts selected; 3 checks passed",
+        "evidence_record": "rec-checks"
+      },
+      "review": {
+        "state": "accepted",
+        "detail": "Independent review accepted; baseline coverage corrected to 3/9",
+        "evidence_record": "rec-review"
+      },
+      "delivery": {
+        "state": "recovered",
+        "label": "recovered after one IRC retry",
+        "evidence_record": "rec-irc"
+      },
+      "attention": "",
+      "durations": [
+        {
+          "label": "From first receipt",
+          "seconds": 1893,
+          "scope_note": "31m 33s, whole task"
+        },
+        {
+          "label": "Broker send to parent consume",
+          "seconds": 286,
+          "scope_note": "Service Bus leg only"
+        },
+        {
+          "label": "Pack cache, isolated receipt",
+          "seconds": 0.02578,
+          "scope_note": "25.78 ms vs 1.29 ms warm, one receipt, not an end-to-end speedup"
+        }
+      ],
+      "tokens": {
+        "model_calls": 3,
+        "tokens_in": 9412,
+        "tokens_out": 2210,
+        "tokens_reasoning": null,
+        "budget_in": 16384,
+        "budget_out": 8192,
+        "budget_calls": 6,
+        "emit_repairs": 0
+      },
+      "routing": {
+        "task_family": "code_fix",
+        "provider": "hearth-local",
+        "model": "qwen3-27b",
+        "routed_by": "family",
+        "regime": "one call, thinking off, 8192",
+        "job_id": "job_7f3a21"
+      },
+      "path": [
+        {
+          "component": "servicebus",
+          "label": "Service Bus",
+          "state": "used",
+          "host_id": "omen",
+          "summary": "Broker receipts present",
+          "basis": "BROKER-RECEIPTS.jsonl has 12 entries",
+          "evidence_record": "rec-broker",
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "hearth",
+          "label": "HEARTH",
+          "state": "used",
+          "host_id": "omen",
+          "summary": "Job succeeded",
+          "basis": "job-succeeded.json present",
+          "evidence_record": "rec-job",
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "jepa",
+          "label": "JEPA",
+          "state": "unused",
+          "host_id": "omen",
+          "summary": "Not used for HEARTH file packing (desired.packed_files=[])",
+          "basis": "execution.json desired.packed_files is empty",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "maf",
+          "label": "Steppewise/MAF",
+          "state": "unknown",
+          "host_id": "omen",
+          "summary": "No lookup receipt",
+          "basis": "LOOKUP-MEASURE.json absent; absence alone is not evidence of non-use",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "ontology",
+          "label": "Ontology",
+          "state": "used",
+          "host_id": "omen",
+          "summary": "Definition delivered",
+          "basis": "CONTEXT-DELIVERY.json present",
+          "evidence_record": "rec-ctx",
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "ast",
+          "label": "AST/RAM cache",
+          "state": "unknown",
+          "host_id": "omen",
+          "summary": "No attributed receipt",
+          "basis": "no job receipt attributes the AST cache",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "duckdb",
+          "label": "DuckDB",
+          "state": "used",
+          "host_id": "omen",
+          "summary": "Transition written and read back",
+          "basis": "DUCKDB-RECEIPT.json present",
+          "evidence_record": "rec-duck",
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "irc",
+          "label": "IRC",
+          "state": "used",
+          "host_id": "fx99",
+          "summary": "Delivered after retry",
+          "basis": "IRC-RECEIPTS.jsonl present",
+          "evidence_record": "rec-irc",
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "parent",
+          "label": "Parent",
+          "state": "used",
+          "host_id": "omen",
+          "summary": "Consumed",
+          "basis": "consumption.json present",
+          "evidence_record": "rec-parent",
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        }
+      ],
+      "context": {
+        "concept": "Solicitation <- Workflow (via repo_slug)",
+        "hearth_input": {
+          "value": 8462,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:hearth-input",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack": {
+          "value": 7092,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "SELECTED-CONTEXT-PACK.json",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack_sha256": "bbe0a69d5c1f0a7e44e1d1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d",
+        "required_facts_selected": {
+          "value": 9,
+          "unit": "facts",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": 9,
+          "denominator": 9,
+          "note": ""
+        },
+        "required_facts_baseline": {
+          "value": 4,
+          "unit": "facts",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": 4,
+          "denominator": 9,
+          "note": ""
+        },
+        "comparison_note": "Selected coverage 9/9 confirmed. Not a general quality or speed claim.",
+        "corrections": [
+          {
+            "field": "required_facts_baseline",
+            "displayed_value": "3/9",
+            "producer_value": "4/9",
+            "source": "Pitwall brief, 2026-11-04. No review receipt holding 3/9 found in the run directory.",
+            "note": "Selected coverage 9/9 confirmed; no general quality claim."
+          }
+        ]
+      },
+      "caches": {
+        "pack_cache": {
+          "value": 25.78,
+          "unit": "ms",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "pack-cache receipt",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": "isolated receipt, miss path"
+        },
+        "ast_ram": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": "no attributed job receipt"
+        },
+        "model_kv": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": "UNKNOWN: producer does not report model KV per job"
+        }
+      },
+      "duckdb": {
+        "source_snapshot_read": "recorded",
+        "source_snapshot_detail": "snapshot #14 read",
+        "transition_written": "recorded",
+        "transition_written_detail": "1 transition row",
+        "transition_read_back": "recorded",
+        "transition_read_back_detail": "row count matched",
+        "evidence_record": "rec-duck"
+      },
+      "artifacts": [
+        {
+          "name": "SELECTED-CONTEXT-PACK.json",
+          "sha256": "bbe0a69d5c1f0a7e44e1d1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d",
+          "record_id": "rec-ctx",
+          "note": "7,092 bytes"
+        },
+        {
+          "name": "feature.patch",
+          "sha256": "91ac03de7710c4aa22b4d0a0f5e6b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f708",
+          "record_id": null,
+          "note": "not served, hash from receipt"
+        },
+        {
+          "name": "screen.png",
+          "sha256": "c0ffee00112233445566778899aabbccddeeff00112233445566778899aabbcc",
+          "record_id": "rec-png",
+          "note": ""
+        }
+      ],
+      "links": [
+        {
+          "label": "Aspire trace",
+          "url": "http://127.0.0.1:18888/traces",
+          "service_id": "aspire",
+          "enabled": false,
+          "reason": "Aspire unreachable now"
+        },
+        {
+          "label": "Ontology UI",
+          "url": "http://127.0.0.1:5173",
+          "service_id": "ontology",
+          "enabled": true,
+          "reason": ""
+        },
+        {
+          "label": "External doc",
+          "url": "https://example.com/x",
+          "service_id": "x",
+          "enabled": true,
+          "reason": ""
+        }
+      ],
+      "evidence_available": true
+    },
+    {
+      "id": "orland",
+      "title": "Orland three-feature batch",
+      "short_title": "Orland batch (3 features)",
+      "actor": "claude",
+      "host": "omen",
+      "stage": "Deliver",
+      "stages": [
+        {
+          "id": "submit",
+          "label": "Submit",
+          "state": "done"
+        },
+        {
+          "id": "route",
+          "label": "Route",
+          "state": "done"
+        },
+        {
+          "id": "generate",
+          "label": "Generate",
+          "state": "done"
+        },
+        {
+          "id": "check",
+          "label": "Check",
+          "state": "done"
+        },
+        {
+          "id": "review",
+          "label": "Review",
+          "state": "done"
+        },
+        {
+          "id": "deliver",
+          "label": "Deliver",
+          "state": "done"
+        }
+      ],
+      "latest_progress": "Batch finished",
+      "latest_progress_at": "2026-11-08T02:22:46.409Z",
+      "outcome": {
+        "state": "completed",
+        "label": "completed",
+        "summary": "Three features delivered in one batch.",
+        "finished_at": "2026-11-08T02:12:46.409Z"
+      },
+      "checks": {
+        "state": "passed",
+        "detail": "3/3 feature checks",
+        "evidence_record": null
+      },
+      "review": {
+        "state": "pending",
+        "detail": "Awaiting review",
+        "evidence_record": null
+      },
+      "delivery": {
+        "state": "delivered",
+        "label": "delivered",
+        "evidence_record": null
+      },
+      "attention": "",
+      "durations": [
+        {
+          "label": "Batch",
+          "seconds": 755,
+          "scope_note": "12m 35s for the whole three-feature batch"
+        }
+      ],
+      "tokens": {
+        "model_calls": 9,
+        "tokens_in": 41200,
+        "tokens_out": 9980,
+        "tokens_reasoning": null,
+        "budget_in": 65536,
+        "budget_out": 16384,
+        "budget_calls": 12,
+        "emit_repairs": 1
+      },
+      "routing": {
+        "task_family": "code_fix",
+        "provider": "hearth-local",
+        "model": "qwen3-27b",
+        "routed_by": "family",
+        "regime": "one call, thinking off, 8192",
+        "job_id": "job_21bb90"
+      },
+      "path": [
+        {
+          "component": "hearth",
+          "label": "HEARTH",
+          "state": "used",
+          "host_id": "omen",
+          "summary": "Job succeeded",
+          "basis": "execution.json present",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "duckdb",
+          "label": "DuckDB",
+          "state": "unknown",
+          "host_id": "omen",
+          "summary": "Source snapshot use unknown",
+          "basis": "DUCKDB-RECEIPT.json absent",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "ontology",
+          "label": "Ontology",
+          "state": "unknown",
+          "host_id": "omen",
+          "summary": "Unknown",
+          "basis": "receipts absent",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "maf",
+          "label": "Steppewise/MAF",
+          "state": "unknown",
+          "host_id": "omen",
+          "summary": "Unknown",
+          "basis": "receipts absent",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        }
+      ],
+      "context": {
+        "concept": "",
+        "hearth_input": {
+          "value": 8462,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:hearth-input",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack": {
+          "value": 7092,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "SELECTED-CONTEXT-PACK.json",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack_sha256": "bbe0a69d5c1f0a7e44e1d1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d",
+        "required_facts_selected": {
+          "value": null,
+          "unit": "facts",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "required_facts_baseline": {
+          "value": null,
+          "unit": "facts",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "comparison_note": "Selected coverage 9/9 confirmed. Not a general quality or speed claim.",
+        "corrections": []
+      },
+      "caches": {
+        "pack_cache": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "ast_ram": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "model_kv": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": "producer gap"
+        }
+      },
+      "duckdb": {
+        "source_snapshot_read": "unknown",
+        "source_snapshot_detail": "no receipt",
+        "transition_written": "unknown",
+        "transition_written_detail": "",
+        "transition_read_back": "unknown",
+        "transition_read_back_detail": "",
+        "evidence_record": null
+      },
+      "artifacts": [],
+      "links": [],
+      "evidence_available": false
+    },
+    {
+      "id": "help-loop",
+      "title": "help-loop-20261104T2114Z",
+      "short_title": "help-loop 21:14Z",
+      "actor": "claude",
+      "host": "omen",
+      "stage": "Check",
+      "stages": [
+        {
+          "id": "submit",
+          "label": "Submit",
+          "state": "done"
+        },
+        {
+          "id": "route",
+          "label": "Route",
+          "state": "done"
+        },
+        {
+          "id": "generate",
+          "label": "Generate",
+          "state": "done"
+        },
+        {
+          "id": "check",
+          "label": "Check",
+          "state": "attention"
+        },
+        {
+          "id": "review",
+          "label": "Review",
+          "state": "waiting"
+        },
+        {
+          "id": "deliver",
+          "label": "Deliver",
+          "state": "unknown"
+        }
+      ],
+      "latest_progress": "Check needs a rerun",
+      "latest_progress_at": "2026-11-08T03:41:16.409Z",
+      "outcome": {
+        "state": "active",
+        "label": "active",
+        "summary": "Work in progress.",
+        "finished_at": null
+      },
+      "checks": {
+        "state": "unknown",
+        "detail": "not yet run",
+        "evidence_record": null
+      },
+      "review": {
+        "state": "unknown",
+        "detail": "",
+        "evidence_record": null
+      },
+      "delivery": {
+        "state": "waiting",
+        "label": "waiting",
+        "evidence_record": null
+      },
+      "attention": "Check rerun requested",
+      "durations": [],
+      "tokens": {
+        "model_calls": 1,
+        "tokens_in": 3100,
+        "tokens_out": null,
+        "tokens_reasoning": null,
+        "budget_in": 16384,
+        "budget_out": null,
+        "budget_calls": 4,
+        "emit_repairs": null
+      },
+      "routing": {
+        "task_family": "code_review",
+        "provider": "hearth-local",
+        "model": "qwen3-27b",
+        "routed_by": "family",
+        "regime": "one call, thinking off, 8192",
+        "job_id": "job_c0ffee"
+      },
+      "path": [
+        {
+          "component": "servicebus",
+          "label": "Service Bus",
+          "state": "unknown",
+          "host_id": "omen",
+          "summary": "No broker files; direct submission not recorded",
+          "basis": "no field states direct submission",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "hearth",
+          "label": "HEARTH",
+          "state": "active",
+          "host_id": "omen",
+          "summary": "Running",
+          "basis": "execution.json present",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        }
+      ],
+      "context": {
+        "concept": "",
+        "hearth_input": {
+          "value": 8462,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:hearth-input",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack": {
+          "value": 7092,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "SELECTED-CONTEXT-PACK.json",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack_sha256": "bbe0a69d5c1f0a7e44e1d1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d",
+        "required_facts_selected": {
+          "value": null,
+          "unit": "facts",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "required_facts_baseline": {
+          "value": null,
+          "unit": "facts",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "comparison_note": "Selected coverage 9/9 confirmed. Not a general quality or speed claim.",
+        "corrections": []
+      },
+      "caches": {
+        "pack_cache": {
+          "value": 0,
+          "unit": "%",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": 0,
+          "denominator": 0,
+          "note": "no pack lookups"
+        },
+        "ast_ram": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "model_kv": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        }
+      },
+      "duckdb": {
+        "source_snapshot_read": "not_recorded",
+        "source_snapshot_detail": "",
+        "transition_written": "unknown",
+        "transition_written_detail": "",
+        "transition_read_back": "unknown",
+        "transition_read_back_detail": "",
+        "evidence_record": null
+      },
+      "artifacts": [],
+      "links": [],
+      "evidence_available": false
+    },
+    {
+      "id": "markup",
+      "title": "<img src=x onerror=alert(1)> <b>bold</b> & \"quoted\"",
+      "short_title": "<script>alert(2)</script> task",
+      "actor": "claude",
+      "host": "omen",
+      "stage": "Deliver",
+      "stages": [
+        {
+          "id": "submit",
+          "label": "Submit",
+          "state": "done"
+        },
+        {
+          "id": "route",
+          "label": "Route",
+          "state": "done"
+        },
+        {
+          "id": "generate",
+          "label": "Generate",
+          "state": "done"
+        },
+        {
+          "id": "check",
+          "label": "Check",
+          "state": "done"
+        },
+        {
+          "id": "review",
+          "label": "Review",
+          "state": "failed"
+        },
+        {
+          "id": "deliver",
+          "label": "Deliver",
+          "state": "unknown"
+        }
+      ],
+      "latest_progress": "<i>failed</i> in review",
+      "latest_progress_at": "2026-11-08T02:52:46.409Z",
+      "outcome": {
+        "state": "failed",
+        "label": "failed",
+        "summary": "<b>markup</b> in data stays inert",
+        "finished_at": "2026-11-08T01:12:46.409Z"
+      },
+      "checks": {
+        "state": "failed",
+        "detail": "check failed",
+        "evidence_record": null
+      },
+      "review": {
+        "state": "rejected",
+        "detail": "rejected",
+        "evidence_record": null
+      },
+      "delivery": {
+        "state": "failed",
+        "label": "not delivered",
+        "evidence_record": null
+      },
+      "attention": "",
+      "durations": [],
+      "tokens": {
+        "model_calls": 2,
+        "tokens_in": 1000,
+        "tokens_out": 500,
+        "tokens_reasoning": 0,
+        "budget_in": 4096,
+        "budget_out": 2048,
+        "budget_calls": 3,
+        "emit_repairs": 0
+      },
+      "routing": {
+        "task_family": "code_fix",
+        "provider": "hearth-local",
+        "model": "qwen3-27b",
+        "routed_by": "family",
+        "regime": "one call, thinking off, 8192",
+        "job_id": "job_bad001"
+      },
+      "path": [
+        {
+          "component": "hearth",
+          "label": "<b>HEARTH</b>",
+          "state": "used",
+          "host_id": "omen",
+          "summary": "ok",
+          "basis": "x",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        }
+      ],
+      "context": {
+        "concept": "",
+        "hearth_input": {
+          "value": 8462,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:hearth-input",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack": {
+          "value": 7092,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "SELECTED-CONTEXT-PACK.json",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack_sha256": "bbe0a69d5c1f0a7e44e1d1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d",
+        "required_facts_selected": {
+          "value": null,
+          "unit": "facts",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "required_facts_baseline": {
+          "value": null,
+          "unit": "facts",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "comparison_note": "Selected coverage 9/9 confirmed. Not a general quality or speed claim.",
+        "corrections": []
+      },
+      "caches": {
+        "pack_cache": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "ast_ram": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "model_kv": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        }
+      },
+      "duckdb": {
+        "source_snapshot_read": "unknown",
+        "source_snapshot_detail": "",
+        "transition_written": "unknown",
+        "transition_written_detail": "",
+        "transition_read_back": "unknown",
+        "transition_read_back_detail": "",
+        "evidence_record": null
+      },
+      "artifacts": [],
+      "links": [],
+      "evidence_available": false
+    },
+    {
+      "id": "t5",
+      "title": "older task 5",
+      "short_title": "older task 5",
+      "actor": "claude",
+      "host": "omen",
+      "stage": "Deliver",
+      "stages": [
+        {
+          "id": "submit",
+          "label": "Submit",
+          "state": "done"
+        },
+        {
+          "id": "route",
+          "label": "Route",
+          "state": "done"
+        },
+        {
+          "id": "generate",
+          "label": "Generate",
+          "state": "done"
+        },
+        {
+          "id": "check",
+          "label": "Check",
+          "state": "done"
+        },
+        {
+          "id": "review",
+          "label": "Review",
+          "state": "done"
+        },
+        {
+          "id": "deliver",
+          "label": "Deliver",
+          "state": "done"
+        }
+      ],
+      "latest_progress": "Batch finished",
+      "latest_progress_at": "2026-11-08T02:22:46.409Z",
+      "outcome": {
+        "state": "completed",
+        "label": "completed",
+        "summary": "Three features delivered in one batch.",
+        "finished_at": "2026-11-08T02:12:46.409Z"
+      },
+      "checks": {
+        "state": "passed",
+        "detail": "3/3 feature checks",
+        "evidence_record": null
+      },
+      "review": {
+        "state": "pending",
+        "detail": "Awaiting review",
+        "evidence_record": null
+      },
+      "delivery": {
+        "state": "delivered",
+        "label": "delivered",
+        "evidence_record": null
+      },
+      "attention": "",
+      "durations": [
+        {
+          "label": "Batch",
+          "seconds": 755,
+          "scope_note": "12m 35s for the whole three-feature batch"
+        }
+      ],
+      "tokens": {
+        "model_calls": 9,
+        "tokens_in": 41200,
+        "tokens_out": 9980,
+        "tokens_reasoning": null,
+        "budget_in": 65536,
+        "budget_out": 16384,
+        "budget_calls": 12,
+        "emit_repairs": 1
+      },
+      "routing": {
+        "task_family": "code_fix",
+        "provider": "hearth-local",
+        "model": "qwen3-27b",
+        "routed_by": "family",
+        "regime": "one call, thinking off, 8192",
+        "job_id": "job_21bb90"
+      },
+      "path": [
+        {
+          "component": "hearth",
+          "label": "HEARTH",
+          "state": "used",
+          "host_id": "omen",
+          "summary": "Job succeeded",
+          "basis": "execution.json present",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "duckdb",
+          "label": "DuckDB",
+          "state": "unknown",
+          "host_id": "omen",
+          "summary": "Source snapshot use unknown",
+          "basis": "DUCKDB-RECEIPT.json absent",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "ontology",
+          "label": "Ontology",
+          "state": "unknown",
+          "host_id": "omen",
+          "summary": "Unknown",
+          "basis": "receipts absent",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        },
+        {
+          "component": "maf",
+          "label": "Steppewise/MAF",
+          "state": "unknown",
+          "host_id": "omen",
+          "summary": "Unknown",
+          "basis": "receipts absent",
+          "evidence_record": null,
+          "observed_at": "2026-11-08T03:32:46.409Z"
+        }
+      ],
+      "context": {
+        "concept": "",
+        "hearth_input": {
+          "value": 8462,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:hearth-input",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack": {
+          "value": 7092,
+          "unit": "bytes",
+          "observed_at": "2026-11-08T03:42:44.409Z",
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "SELECTED-CONTEXT-PACK.json",
+          "status": "ok",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "selected_pack_sha256": "bbe0a69d5c1f0a7e44e1d1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d",
+        "required_facts_selected": {
+          "value": null,
+          "unit": "facts",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "required_facts_baseline": {
+          "value": null,
+          "unit": "facts",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:receipts",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "comparison_note": "Selected coverage 9/9 confirmed. Not a general quality or speed claim.",
+        "corrections": []
+      },
+      "caches": {
+        "pack_cache": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "ast_ram": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": ""
+        },
+        "model_kv": {
+          "value": null,
+          "unit": "%",
+          "observed_at": null,
+          "read_at": "2026-11-08T03:42:46.409Z",
+          "source": "sample:fleet-top",
+          "status": "unknown",
+          "scope": "job",
+          "window": null,
+          "numerator": null,
+          "denominator": null,
+          "note": "producer gap"
+        }
+      },
+      "duckdb": {
+        "source_snapshot_read": "unknown",
+        "source_snapshot_detail": "no receipt",
+        "transition_written": "unknown",
+        "transition_written_detail": "",
+        "transition_read_back": "unknown",
+        "transition_read_back_detail": "",
+        "evidence_record": null
+      },
+      "artifacts": [],
+      "links": [],
+      "evidence_available": false
+    }
+  ],
+  "default_task_id": "relpack",
+  "coverage_notes": [
+    "flow-top returns at most 10 tasks and has no limit option.",
+    "Model KV per job is not reported by the producer."
+  ],
+  "history_started_at": "2026-11-08T03:39:46.409Z"
+}

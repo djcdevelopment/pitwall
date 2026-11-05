@@ -1,0 +1,16 @@
+desktop-1400x900 1400x900: scrollHeight=900 scrollWidth=1400/1400 hOverflow=false clipped=["tb-title ellip:554>333","exc-t:311>185","dim ellip:83>48","dim ellip:83>59","dim ellip:95>59","dim ellip:83>48","colx:202>192","cl:202>192"]
+strip-1400x140 1400x140: scrollHeight=140 scrollWidth=1400/1400 hOverflow=false clipped=["hl:135>95"]
+strip-1024x140 1024x140: scrollHeight=140 scrollWidth=1024/1024 hOverflow=false clipped=["hl:135>95"]
+narrow-820x1180 820x1180: scrollHeight=3217 scrollWidth=820/820 hOverflow=false clipped=["dim cr-n ellip:477>375"]
+narrow-390x844 390x844: scrollHeight=4822 scrollWidth=390/390 hOverflow=false clipped=["dim cr-n ellip:477>352","dim ellip:273>211"]
+desktop-demo-1400 1400x900: scrollHeight=900 scrollWidth=1400/1400 hOverflow=false clipped=["hdr:1380>1378","hdr-row:1370>1358","tb-title ellip:554>333","exc-t:311>185","dim ellip:83>48","dim ellip:83>59","dim ellip:95>59","dim ellip:83>48"]
+strip-demo-1400x140 1400x140: scrollHeight=140 scrollWidth=1400/1400 hOverflow=false clipped=["hl:135>95"]
+narrow-demo-390x844 390x844: scrollHeight=4880 scrollWidth=390/390 hOverflow=false clipped=["dim cr-n ellip:477>352","dim ellip:273>211"]
+desktop-evidence-1400 1400x900: scrollHeight=900 scrollWidth=1400/1400 hOverflow=false clipped=["tb-title ellip:554>333","exc-t:311>185","dim ellip:83>48","dim ellip:83>59","dim ellip:95>59","dim ellip:83>48","colx:202>192","cl:202>192"]
+narrow-evidence-390 390x844: scrollHeight=4822 scrollWidth=390/390 hOverflow=false clipped=["dim cr-n ellip:477>352","dim ellip:273>211"]
+desktop-markup-1400 1400x900: scrollHeight=900 scrollWidth=1400/1400 hOverflow=false clipped=["tb-title ellip:428>350","exc-t:311>185","dim ellip:83>48","dim ellip:83>59","dim ellip:95>59","dim ellip:83>48","colx:196>192","cl:196>192"]
+keyboard walk: 59 focus stops in 60 Tabs, 0 without visible outline; first stops: mode-live:Live | mode-demo:Demo | win-60:1m | win-300:5m | win-900:15m | view-desktop:Desktop | view-strip:Strip | view-narrow:Narrow | motion:Reduce motion | export:Export | hop-0:Service Bus✓us | hop-1:HEARTH✓usedOME
+drawer: focus moved in=true, trapped after 40 Tabs=true, Esc closed=true, focus returned to hop-0
+reduced motion: animation before toggle [pulse], after toggle [none]
+prefers-reduced-motion: animation [none,none,none,none,none,none,none,none,none,none,none,none,none,none,none]
+external requests: none

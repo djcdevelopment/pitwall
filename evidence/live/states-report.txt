@@ -1,0 +1,9 @@
+frozen fleet: unreachable age 20 exception unreachable | device util 0 stale | flow idle tasks 10
+history device.AM4#0.memory_used nulls 3 of 4
+failed flow: unreachable exception unreachable | fleet idle devices 5 tasks 0
+keyboard: tabs 70, focus stops 68 distinct 28 without visible focus 0
+running animations before 15
+running animations with reduce motion 0
+running animations with prefers-reduced-motion 0
+drawer closes on Esc true
+desktop height 900

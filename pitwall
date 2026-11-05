@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# Start, stop or inspect the Pitwall service. Stop acts only on the PID this script launched.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+RUN="$ROOT/run"
+PIDFILE="$RUN/pitwall.pid"
+LOG="$RUN/pitwall.log"
+PORT="${PITWALL_PORT:-18110}"
+MATCH="-m pitwall"
+
+port_busy() {
+  python3 -I -c 'import socket,sys
+s=socket.socket(); s.settimeout(0.3)
+sys.exit(0 if s.connect_ex(("127.0.0.1",int(sys.argv[1])))==0 else 1)' "$1"
+}
+
+next_free_port() {
+  local p=$(($1 + 1))
+  while port_busy "$p"; do p=$((p + 1)); done
+  echo "$p"
+}
+
+# Prints the PID only if the recorded process is still Pitwall.
+own_pid() {
+  [ -f "$PIDFILE" ] || return 1
+  local pid
+  pid="$(cat "$PIDFILE")"
+  [[ "$pid" =~ ^[0-9]+$ ]] || return 1
+  [ -r "/proc/$pid/cmdline" ] || return 1
+  tr '\0' ' ' <"/proc/$pid/cmdline" | grep -q -- "$MATCH" || return 1
+  echo "$pid"
+}
+
+cmd_start() {
+  mkdir -p "$RUN"
+  if pid="$(own_pid)"; then
+    echo "Pitwall is already running: pid $pid, http://127.0.0.1:$PORT"
+    return 0
+  fi
+  if port_busy "$PORT"; then
+    echo "Port $PORT is in use by another process; leaving it alone." >&2
+    echo "Next free port: $(next_free_port "$PORT"). Run: PITWALL_PORT=$(next_free_port "$PORT") $0 start" >&2
+    return 1
+  fi
+  if [ ! -f "$ROOT/web/dist/index.html" ]; then
+    echo "Building the frontend..."
+    (cd "$ROOT/web" && npm ci --silent && npm run build --silent)
+  fi
+  cd "$ROOT"
+  PITWALL_PORT="$PORT" nohup "$ROOT/.venv/bin/python" -m pitwall >"$LOG" 2>&1 &
+  echo $! >"$PIDFILE"
+  for _ in $(seq 1 30); do
+    if curl -fsS -m 1 "http://127.0.0.1:$PORT/api/health" >/dev/null 2>&1; then
+      echo "Pitwall: http://127.0.0.1:$PORT (pid $(cat "$PIDFILE"), log $LOG)"
+      return 0
+    fi
+    sleep 0.2
+  done
+  echo "Pitwall did not answer within 6 s; see $LOG" >&2
+  return 1
+}
+
+cmd_stop() {
+  if pid="$(own_pid)"; then
+    kill "$pid"
+    for _ in $(seq 1 25); do
+      [ -d "/proc/$pid" ] || break
+      sleep 0.2
+    done
+    rm -f "$PIDFILE"
+    echo "Stopped pid $pid"
+  else
+    rm -f "$PIDFILE"
+    echo "Pitwall is not running (no recorded Pitwall process)."
+  fi
+}
+
+cmd_status() {
+  if pid="$(own_pid)"; then
+    echo "running: pid $pid, http://127.0.0.1:$PORT"
+    curl -fsS -m 2 "http://127.0.0.1:$PORT/api/health" || true
+    echo
+  else
+    echo "stopped"
+  fi
+}
+
+case "${1:-}" in
+  start) cmd_start ;;
+  stop) cmd_stop ;;
+  status) cmd_status ;;
+  *) echo "usage: $0 start|stop|status" >&2; exit 2 ;;
+esac

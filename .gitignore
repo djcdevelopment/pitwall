@@ -6,3 +6,5 @@ node_modules/
 dist/
 run/
 web/test-results/
+server/pitwall.egg-info/
+*.egg-info/

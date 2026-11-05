@@ -1,0 +1,38 @@
+{
+  "task_id": "relpack",
+  "records": [
+    {
+      "record_id": "rec-ctx",
+      "name": "SELECTED-CONTEXT-PACK.json",
+      "kind": "json",
+      "bytes": 7092,
+      "modified_at": "2026-11-05T04:10:12.119Z"
+    },
+    {
+      "record_id": "rec-job",
+      "name": "job-succeeded.json",
+      "kind": "json",
+      "bytes": 1820,
+      "modified_at": "2026-11-05T04:10:12.119Z"
+    },
+    {
+      "record_id": "rec-broker",
+      "name": "BROKER-RECEIPTS.jsonl",
+      "kind": "jsonl",
+      "bytes": 5230,
+      "modified_at": "2026-11-05T04:10:12.119Z"
+    },
+    {
+      "record_id": "rec-png",
+      "name": "screen.png",
+      "kind": "image",
+      "bytes": 20310,
+      "modified_at": "2026-11-05T04:10:12.119Z"
+    }
+  ],
+  "not_served": [
+    "feature.patch",
+    "helper-result.txt",
+    "run.log"
+  ]
+}

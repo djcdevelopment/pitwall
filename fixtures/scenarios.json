@@ -1,0 +1,51 @@
+{
+ "schema": "pitwall.demo.v1",
+ "note": "Synthetic pairings of independently captured collector fixtures. Not live data. No real run directory is read in demo mode.",
+ "scenarios": [
+  {
+   "id": "idle",
+   "note": "Synthetic pairing: fleet fixture 'serving_idle_eval_active' with its active work cleared (edited fixture) + flow fixture 'orland_completed'.",
+   "fleet": "raw/fleet-idle_cleared.edited.json",
+   "flow": "raw/flow-orland_completed.json",
+   "edited": [
+    "fleet"
+   ]
+  },
+  {
+   "id": "active",
+   "note": "Synthetic pairing: fleet fixture 'serving_idle_eval_active' + flow fixture 'orland_live'.",
+   "fleet": "raw/fleet-serving_idle_eval_active.json",
+   "flow": "raw/flow-orland_live.json",
+   "edited": []
+  },
+  {
+   "id": "degraded",
+   "note": "Synthetic pairing: fleet fixture 'unreachable_host_partial_power' + flow fixture 'degraded_collector'. The last task title carries markup on purpose, as an XSS check.",
+   "fleet": "raw/fleet-unreachable_host_partial_power.json",
+   "flow": "raw/flow-degraded_collector.json",
+   "edited": [],
+   "patches": [
+    {
+     "task_index": -1,
+     "field": "title",
+     "append": " <img src=x onerror=alert(1)>"
+    },
+    {
+     "task_index": -1,
+     "field": "human_title",
+     "append": " <img src=x onerror=alert(1)>"
+    }
+   ]
+  },
+  {
+   "id": "recovered",
+   "note": "Synthetic pairing: fleet fixture 'serving_idle_eval_active' with its active work cleared (edited fixture) + a hand-written flow fixture derived from the 'orland_completed' shape (three tasks, reordered, header text edited).",
+   "fleet": "raw/fleet-idle_cleared.edited.json",
+   "flow": "raw/flow-recovered.handwritten.json",
+   "edited": [
+    "fleet",
+    "flow"
+   ]
+  }
+ ]
+}
