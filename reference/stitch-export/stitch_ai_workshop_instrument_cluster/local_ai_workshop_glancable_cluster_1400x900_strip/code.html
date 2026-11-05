@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AERO-CLUSTER — Analog Oscilloscope Telemetry Instrument</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&amp;family=JetBrains+Mono:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@200..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        mono: ['"Share Tech Mono"', '"JetBrains Mono"', 'monospace'],
+        display: ['"JetBrains Mono"', 'monospace'],
+      },
+      colors: {
+        crt: {
+          950: '#060a08',
+          900: '#0a0f0d',
+          850: '#0f1714',
+          800: '#14201b',
+          700: '#1b2d26',
+          green: '#00ff88',
+          amber: '#ffaa00',
+          cyan: '#00e5ff',
+          crimson: '#ff3344',
+          dim: '#234135',
+        }
+      }
+    }
+  }
+}
+</script>
+<style>
+  body {
+    background-color: #060a08;
+    color: #a3c2b4;
+    font-family: 'Share Tech Mono', 'JetBrains Mono', monospace;
+  }
+  .mono { font-family: 'Share Tech Mono', monospace; }
+  .jb-mono { font-family: 'JetBrains Mono', monospace; }
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  /* CRT Graticule / Phosphor Grid Texture */
+  .crt-graticule {
+    background-size: 20px 20px;
+    background-image: 
+      linear-gradient(to right, rgba(0, 255, 136, 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 255, 136, 0.08) 1px, transparent 1px);
+  }
+  .crt-graticule-dense {
+    background-size: 10px 10px;
+    background-image: 
+      linear-gradient(to right, rgba(0, 255, 136, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 255, 136, 0.06) 1px, transparent 1px);
+  }
+  .crt-scanlines {
+    background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0px, rgba(0, 0, 0, 0.25) 1px, transparent 1px, transparent 2px);
+    pointer-events: none;
+  }
+
+  /* Phosphor Tube Screen Bloom */
+  .phosphor-glow-green {
+    filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.75)) drop-shadow(0 0 12px rgba(0, 255, 136, 0.35));
+  }
+  .phosphor-glow-amber {
+    filter: drop-shadow(0 0 6px rgba(255, 170, 0, 0.85)) drop-shadow(0 0 14px rgba(255, 170, 0, 0.4));
+  }
+  .phosphor-glow-cyan {
+    filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.8)) drop-shadow(0 0 12px rgba(0, 229, 255, 0.35));
+  }
+  .text-glow-green {
+    text-shadow: 0 0 6px rgba(0, 255, 136, 0.65), 0 0 12px rgba(0, 255, 136, 0.3);
+  }
+  .text-glow-amber {
+    text-shadow: 0 0 6px rgba(255, 170, 0, 0.75), 0 0 14px rgba(255, 170, 0, 0.3);
+  }
+
+  /* Segmented Pip Arrays */
+  .seg-bar {
+    display: flex;
+    gap: 2px;
+    height: 6px;
+  }
+  .seg-pip {
+    flex: 1;
+    border-radius: 0.5px;
+    background: #111a16;
+    transition: all 0.15s ease;
+  }
+  .seg-pip.c-green { background: #00ff88; box-shadow: 0 0 5px rgba(0, 255, 136, 0.8); }
+  .seg-pip.c-amber { background: #ffaa00; box-shadow: 0 0 6px rgba(255, 170, 0, 0.9); }
+  .seg-pip.c-cyan  { background: #00e5ff; box-shadow: 0 0 5px rgba(0, 229, 255, 0.8); }
+  .seg-pip.c-red   { background: #ff3344; box-shadow: 0 0 6px rgba(255, 51, 68, 0.9); }
+
+  /* Oscilloscope Vector Beam Pulse */
+  @keyframes scopeSweep {
+    0% { stroke-dashoffset: 60; }
+    100% { stroke-dashoffset: 0; }
+  }
+  .beam-active {
+    stroke-dasharray: 6, 3;
+    animation: scopeSweep 0.9s linear infinite;
+  }
+
+  /* Radial meter ring */
+  .radial-bg { stroke: #122019; }
+  .radial-prog {
+    stroke-dasharray: 251.2;
+    transition: stroke-dashoffset 0.5s ease;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-thumb { background: #1b2d26; }
+</style>
+</head>
+<body class="min-h-screen bg-crt-950 p-2 sm:p-3 md:p-4 text-emerald-100/80 select-none antialiased flex flex-col items-center justify-start">
+<!-- TOP CONSOLE / OSCILLOSCOPE CHROME & MODE SELECTOR -->
+<div class="w-full max-w-[1400px] mb-2 flex items-center justify-between px-3 py-1.5 bg-crt-900 border border-crt-700/80 rounded shadow-[inset_0_1px_0_rgba(0,255,136,0.15)] relative">
+<div class="flex items-center gap-3">
+<!-- Oscilloscope Tube Target Emblem -->
+<div class="flex items-center gap-2">
+<div class="relative w-3.5 h-3.5 flex items-center justify-center">
+<span class="absolute w-3.5 h-3.5 rounded-full border border-crt-green/40 animate-ping"></span>
+<span class="w-2 h-2 rounded-full bg-crt-green phosphor-glow-green"></span>
+</div>
+<span class="jb-mono text-xs font-extrabold text-crt-green tracking-widest uppercase text-glow-green">TELEM-OSCILLOSCOPE // CLUSTER-88</span>
+</div>
+<span class="text-[11px] mono px-2 py-0.5 rounded bg-crt-850 text-emerald-400/90 border border-crt-700">CH-A:OMEN ↔ CH-B:AM4 ↔ CH-C:FX99</span>
+<span class="text-[10px] mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-crt-green border border-crt-green/30 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-crt-green"></span> 2.5kHz PHOSPHOR SAMPLE
+    </span>
+</div>
+<!-- Interactive Scenario Controller Buttons -->
+<div class="hidden sm:flex items-center gap-1 mono text-[10px]">
+<span class="text-emerald-600/90 mr-1.5 tracking-wider">SWEEP REGIME:</span>
+<button class="px-2.5 py-0.5 rounded bg-crt-green text-crt-950 border border-crt-green font-bold shadow-[0_0_8px_rgba(0,255,136,0.5)] transition" id="btn-s-active" onclick="setScenario('active')">ACTIVE</button>
+<button class="px-2.5 py-0.5 rounded bg-crt-850 text-emerald-400/70 border border-crt-700 hover:text-white hover:border-crt-green/50 transition" id="btn-s-blocked" onclick="setScenario('blocked')">BLOCKED</button>
+<button class="px-2.5 py-0.5 rounded bg-crt-850 text-emerald-400/70 border border-crt-700 hover:text-white hover:border-crt-green/50 transition" id="btn-s-idle" onclick="setScenario('idle')">IDLE</button>
+</div>
+<!-- VIEWPORT DISPLAY MODE TOGGLE -->
+<div class="flex items-center gap-1 bg-crt-850 p-1 rounded border border-crt-700 mono text-[11px]">
+<button class="flex items-center gap-1.5 px-3 py-0.5 rounded bg-crt-green text-crt-950 font-bold transition shadow-[0_0_8px_rgba(0,255,136,0.6)]" id="viewBtnExpanded" onclick="setViewMode('expanded')">
+<span class="material-symbols-outlined text-[15px]">grid_goldenratio</span>
+<span>⊞ EXPANDED (1400×900)</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-0.5 rounded text-emerald-400/70 hover:text-crt-green hover:bg-crt-800 transition" id="viewBtnRibbon" onclick="setViewMode('ribbon')">
+<span class="material-symbols-outlined text-[15px]">splitscreen</span>
+<span>⊟ HORIZONTAL STRIP (1400×140)</span>
+</button>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- 1. COMPACT HORIZONTAL RIBBON STRIP VIEW (~1400x140px Docked Bar Mode)     -->
+<!-- ========================================================================= -->
+<section class="hidden w-full max-w-[1400px] h-[142px] bg-crt-900 border-2 border-crt-700 rounded p-2.5 shadow-[0_0_20px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col justify-between" id="ribbonStripContainer">
+<div class="absolute inset-0 crt-graticule-dense pointer-events-none opacity-45"></div>
+<div class="absolute inset-0 crt-scanlines"></div>
+<!-- Strip Top: Vector Path & Glance Glyphs -->
+<div class="relative z-10 flex items-center justify-between gap-3 border-b border-crt-800 pb-1.5">
+<div class="flex items-center gap-3">
+<!-- Oscilloscope Status Blip -->
+<div class="flex items-center gap-1.5 mono">
+<span class="w-2.5 h-2.5 rounded-full bg-crt-green phosphor-glow-green animate-ping" id="ribbonLed"></span>
+<span class="text-xs font-bold text-crt-green text-glow-green" id="ribbonJobId">#4092</span>
+<span class="text-[10px] text-crt-green font-bold px-1.5 py-0.2 rounded bg-emerald-950 border border-crt-green/40" id="ribbonJobTag">SWEEP ACTIVE</span>
+</div>
+<!-- Vector Bus Glyphs -->
+<div class="flex items-center gap-1.5 text-[10px] mono">
+<span class="text-emerald-400 font-bold">● PG-SQL</span>
+<span class="text-crt-green">━►</span>
+<span class="text-emerald-400 font-bold">● JEPA/NPU</span>
+<span class="text-crt-amber font-extrabold animate-pulse">━━►►</span>
+<span class="text-crt-amber font-bold px-2 py-0.2 rounded bg-amber-950/80 border border-crt-amber text-glow-amber" id="ribbonStageInfer">▶ AM4 3090 [14.8 t/s]</span>
+<span class="text-emerald-800">━►</span>
+<span class="text-emerald-600">○ DUCKDB SNAP</span>
+</div>
+</div>
+<!-- Glance Readout Cluster -->
+<div class="flex items-center gap-4 text-[11px] mono tabular">
+<div class="flex items-center gap-1.5">
+<span class="text-emerald-600 text-[10px]">PEAK FLUX:</span>
+<span class="text-crt-amber font-bold flex items-center gap-1 text-glow-amber" id="ribbonBottleneck">
+<span class="w-2 h-2 rounded-full bg-crt-amber animate-pulse"></span> VRAM 88% (SATURATING)
+        </span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-emerald-600 text-[10px]">CADENCE:</span>
+<span class="text-crt-cyan font-bold text-glow-cyan" id="ribbonRate">14.8 tok/s</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-emerald-600 text-[10px]">KV CACHE:</span>
+<span class="text-crt-green font-bold">78% HIT</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-emerald-600 text-[10px]">ELAPSED:</span>
+<span class="text-white font-bold" id="ribbonElapsed">03:42.8</span>
+</div>
+</div>
+</div>
+<!-- Strip Bottom: 7 Monospace Analog Waveforms -->
+<div class="relative z-10 grid grid-cols-7 gap-2 h-[82px] pt-1 items-stretch">
+<!-- 1. OMEN HOST CPU -->
+<div class="bg-crt-950/90 border border-crt-800 rounded p-1.5 flex flex-col justify-between">
+<div class="flex justify-between items-center text-[9px] mono">
+<span class="text-emerald-500 font-semibold">OMEN CPU CH1</span>
+<span class="text-emerald-300 tabular font-bold">28%</span>
+</div>
+<svg class="w-full h-8 overflow-visible" preserveaspectratio="none" viewbox="0 0 100 24">
+<path d="M0,20 L15,18 L30,19 L45,15 L60,16 L75,12 L90,14 L100,13" fill="none" stroke="#234135" stroke-width="1.6"></path>
+<path d="M0,20 L15,18 L30,19 L45,15 L60,16 L75,12 L90,14 L100,13" fill="none" opacity="0.65" stroke="#00ff88" stroke-width="1.2"></path>
+</svg>
+<div class="seg-bar"><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div></div>
+</div>
+<!-- 2. JEPA NPU OSCILLATION -->
+<div class="bg-crt-950/90 border border-crt-800 rounded p-1.5 flex flex-col justify-between">
+<div class="flex justify-between items-center text-[9px] mono">
+<span class="text-crt-cyan font-semibold">JEPA NPU CH2</span>
+<span class="text-crt-cyan tabular font-bold text-glow-cyan">42%</span>
+</div>
+<svg class="w-full h-8 overflow-visible" preserveaspectratio="none" viewbox="0 0 100 24">
+<path class="phosphor-glow-cyan" d="M0,22 L20,20 L40,11 L60,10 L80,12 L100,10" fill="none" stroke="#00e5ff" stroke-width="1.8"></path>
+</svg>
+<div class="seg-bar"><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div></div>
+</div>
+<!-- 3. AM4 3090 COMPUTE BEAM (High Phosphor Stroke 3.5px) -->
+<div class="bg-crt-950/90 border border-crt-green/70 rounded p-1.5 flex flex-col justify-between shadow-[inset_0_0_8px_rgba(0,255,136,0.2)]">
+<div class="flex justify-between items-center text-[9px] mono">
+<span class="text-crt-green font-bold text-glow-green">AM4 3090 GPU</span>
+<span class="text-crt-green tabular font-extrabold text-[10px] text-glow-green" id="ribbonGpuPct">94%</span>
+</div>
+<svg class="w-full h-8 overflow-visible" preserveaspectratio="none" viewbox="0 0 100 24">
+<path class="phosphor-glow-green" d="M0,19 L14,16 L28,5 L44,2 L60,3 L75,2 L90,1 L100,1.5" fill="none" id="ribbonGpuWave" stroke="#00ff88" stroke-width="3.5"></path>
+</svg>
+<div class="seg-bar"><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip"></div></div>
+</div>
+<!-- 4. VRAM PRESSURE (Radiation Amber Surge) -->
+<div class="bg-crt-950/90 border border-crt-amber/80 rounded p-1.5 flex flex-col justify-between shadow-[inset_0_0_8px_rgba(255,170,0,0.15)]">
+<div class="flex justify-between items-center text-[9px] mono">
+<span class="text-crt-amber font-bold text-glow-amber">VRAM FLUX</span>
+<span class="text-crt-amber tabular font-bold text-glow-amber" id="ribbonVramPct">88%</span>
+</div>
+<svg class="w-full h-8 overflow-visible" preserveaspectratio="none" viewbox="0 0 100 24">
+<line stroke="#ff3344" stroke-dasharray="2,2" stroke-width="1" x1="0" x2="100" y1="2" y2="2"></line>
+<path class="phosphor-glow-amber" d="M0,7 L20,6 L40,4 L60,3 L80,3 L100,2.5" fill="none" id="ribbonVramWave" stroke="#ffaa00" stroke-width="3.0"></path>
+</svg>
+<div class="seg-bar"><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip"></div><div class="seg-pip"></div></div>
+</div>
+<!-- 5. PULSE RATE CADENCE -->
+<div class="bg-crt-950/90 border border-crt-800 rounded p-1.5 flex flex-col justify-between">
+<div class="flex justify-between items-center text-[9px] mono">
+<span class="text-crt-cyan font-semibold">CADENCE (t/s)</span>
+<span class="text-white tabular font-bold text-glow-cyan" id="ribbonCadencePct">14.8</span>
+</div>
+<svg class="w-full h-8 overflow-visible" preserveaspectratio="none" viewbox="0 0 100 24">
+<path class="phosphor-glow-cyan" d="M0,23 L20,23 L35,5 L50,6 L65,5 L80,6 L100,5" fill="none" stroke="#00e5ff" stroke-width="2.2"></path>
+</svg>
+<div class="seg-bar"><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div></div>
+</div>
+<!-- 6. KV CACHE HIT ARC -->
+<div class="bg-crt-950/90 border border-crt-800 rounded p-1.5 flex flex-col justify-between">
+<div class="flex justify-between items-center text-[9px] mono">
+<span class="text-emerald-400 font-semibold">KV HIT MEM</span>
+<span class="text-crt-green tabular font-bold">78%</span>
+</div>
+<svg class="w-full h-8 overflow-visible" preserveaspectratio="none" viewbox="0 0 100 24">
+<path class="phosphor-glow-green" d="M0,12 L30,12 L50,8 L70,8 L100,7" fill="none" stroke="#00ff88" stroke-width="2.0"></path>
+</svg>
+<div class="seg-bar"><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip"></div><div class="seg-pip"></div></div>
+</div>
+<!-- 7. ETH DUPLEX BUS -->
+<div class="bg-crt-950/90 border border-crt-800 rounded p-1.5 flex flex-col justify-between">
+<div class="flex justify-between items-center text-[9px] mono">
+<span class="text-emerald-500 font-semibold">ETH LINK BUS</span>
+<span class="text-emerald-300 tabular font-bold">0.18ms</span>
+</div>
+<svg class="w-full h-8 overflow-visible" preserveaspectratio="none" viewbox="0 0 100 24">
+<path d="M0,22 L15,19 L30,22 L45,18 L60,22 L75,19 L90,21 L100,20" fill="none" stroke="#00ff88" stroke-width="1.4"></path>
+</svg>
+<div class="seg-bar"><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div></div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 2. EXPANDED OSCILLOSCOPE DASHBOARD (~1400x900px High-Density 2K Visual)   -->
+<!-- ========================================================================= -->
+<main class="w-full max-w-[1400px] h-[880px] bg-crt-900 border border-crt-700 rounded p-3.5 shadow-2xl flex flex-col justify-between relative overflow-hidden" id="expandedContainer">
+<!-- Subtle Phosphor Tube Background Graticule & Scanlines -->
+<div class="absolute inset-0 crt-graticule pointer-events-none opacity-30"></div>
+<div class="absolute inset-0 crt-scanlines pointer-events-none"></div>
+<!-- TOP SECTION: MISSION STATUS & VECTOR TOPOLOGY SWEEP (~155px) -->
+<div class="relative z-10 flex-none space-y-2.5">
+<!-- Top Telemetry Header -->
+<div class="flex flex-wrap items-center justify-between gap-2 border-b border-crt-800 pb-2">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2">
+<span class="mono text-xs px-2.5 py-0.5 rounded bg-emerald-950 text-crt-green border border-crt-green/80 font-bold flex items-center gap-1.5 shadow-[0_0_8px_rgba(0,255,136,0.3)] text-glow-green" id="mainJobStatusPill">
+<span class="w-2 h-2 rounded-full bg-crt-green animate-ping"></span> ACTIVE #4092
+          </span>
+<span class="jb-mono text-sm font-bold text-white tracking-wider" id="mainJobTitle">extract_table_relationships_am4</span>
+</div>
+<span class="text-xs text-emerald-500/80 mono">➔ DuckDB Vector Catalog Snapshot #14</span>
+</div>
+<!-- Wordless / High-Density Glance Readouts -->
+<div class="flex items-center gap-2 mono text-xs">
+<!-- Bottleneck Pill -->
+<div class="bg-amber-950/60 border border-crt-amber px-3 py-1 rounded flex items-center gap-2 shadow-[0_0_8px_rgba(255,170,0,0.2)]" id="mainBottleneckBox">
+<span class="material-symbols-outlined text-crt-amber text-base">warning</span>
+<span class="text-emerald-500 text-[10px]">BOTTLENECK:</span>
+<span class="text-crt-amber font-extrabold tabular text-glow-amber" id="mainBottleneckLabel">AM4 VRAM 88% (21.2 / 24.0 GB)</span>
+</div>
+<!-- Token Emission Cadence -->
+<div class="bg-crt-950 border border-crt-700 px-3 py-1 rounded flex items-center gap-2">
+<span class="material-symbols-outlined text-crt-cyan text-base">grain</span>
+<span class="text-white font-extrabold tabular text-glow-cyan" id="mainTokRate">14.8 tok/s</span>
+</div>
+<!-- Clock / Epoch -->
+<div class="bg-crt-950 border border-crt-700 px-3 py-1 rounded tabular">
+<span class="text-crt-green font-bold text-glow-green" id="mainElapsed">00:03:42.84</span>
+<span class="text-emerald-700 text-[10px]"> / REM ~18s</span>
+</div>
+</div>
+</div>
+<!-- CRT OSCILLOSCOPE TOPOLOGY BEAM PIPELINE (Vector Arrows with Pure Visual Intensity) -->
+<div class="bg-crt-950/90 border border-crt-700 rounded p-2.5 relative">
+<div class="flex items-center justify-between mb-1.5 text-[10px] mono">
+<span class="flex items-center gap-1.5 uppercase tracking-wider text-emerald-400">
+<span class="material-symbols-outlined text-sm text-crt-green">tune</span> OSCILLOSCOPE HARNESS — VECTOR TOPOLOGY BEAM
+        </span>
+<span class="text-crt-amber font-bold text-glow-amber" id="flowStatusLabel">PHASE 03: AM4 3090 COMPUTE SATURATED (BEAM INTENSITY 94%)</span>
+</div>
+<div class="grid grid-cols-12 gap-2 items-center">
+<!-- Node 1: Bus Broker -->
+<div class="col-span-2 bg-crt-900 border border-emerald-800/80 rounded p-2 text-center">
+<div class="flex items-center justify-center gap-1 text-crt-green text-xs font-bold mono">
+<span class="material-symbols-outlined text-sm">radio_button_checked</span> HEARTH BUS
+          </div>
+<div class="text-[10px] text-emerald-400/80 mono mt-0.5">LATENCY: 1.8ms</div>
+<div class="w-full bg-crt-800 h-1.5 rounded mt-1.5 overflow-hidden">
+<div class="bg-crt-green h-full w-full"></div>
+</div>
+</div>
+<!-- Beam Arrow 1 -->
+<div class="col-span-1 flex items-center justify-center">
+<svg class="w-full h-5" viewbox="0 0 40 10">
+<line stroke="#00ff88" stroke-width="2.2" x1="0" x2="33" y1="5" y2="5"></line>
+<polygon fill="#00ff88" points="33,1 40,5 33,9"></polygon>
+</svg>
+</div>
+<!-- Node 2: OMEN JEPA Embed -->
+<div class="col-span-2 bg-crt-900 border border-emerald-800/80 rounded p-2 text-center">
+<div class="flex items-center justify-center gap-1 text-crt-cyan text-xs font-bold mono">
+<span class="material-symbols-outlined text-sm">developer_board</span> OMEN JEPA NPU
+          </div>
+<div class="text-[10px] text-crt-cyan/80 mono mt-0.5">384-DIM • 0.9s SWEEP</div>
+<div class="w-full bg-crt-800 h-1.5 rounded mt-1.5 overflow-hidden">
+<div class="bg-crt-cyan h-full w-full"></div>
+</div>
+</div>
+<!-- Beam Arrow 2 (High Pulse Beam) -->
+<div class="col-span-2 flex items-center justify-center px-1">
+<svg class="w-full h-7" viewbox="0 0 80 14">
+<line class="beam-active phosphor-glow-green" stroke="#00ff88" stroke-width="3.5" x1="2" x2="70" y1="7" y2="7"></line>
+<polygon fill="#00ff88" points="70,1 79,7 70,13"></polygon>
+</svg>
+</div>
+<!-- Node 3: AM4 RTX 3090 PRIMARY BEAM (3.5px Stroke & Radial Glow) -->
+<div class="col-span-3 bg-emerald-950/70 border-2 border-crt-green rounded p-2 text-center relative shadow-[0_0_15px_rgba(0,255,136,0.35)]" id="flowNodeAM4">
+<div class="absolute -top-2 right-2 px-1.5 py-0.2 bg-crt-green text-crt-950 font-black text-[9px] mono rounded uppercase shadow">
+            HOT FOCUS
+          </div>
+<div class="flex items-center justify-center gap-1.5 text-crt-green text-xs font-bold mono text-glow-green">
+<span class="material-symbols-outlined text-base animate-spin text-crt-green">progress_activity</span>
+<span>AM4 (RTX 3090 COMPUTE)</span>
+</div>
+<div class="text-[11px] text-white font-bold mono mt-0.5 tabular" id="flowAM4Rate">
+            14.8 tok/s • UTIL 94% • VRAM 88%
+          </div>
+<div class="seg-bar mt-1.5" id="flowAM4Seg">
+<div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div>
+<div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div>
+<div class="seg-pip c-green"></div><div class="seg-pip"></div>
+</div>
+</div>
+<!-- Beam Arrow 3 -->
+<div class="col-span-1 flex items-center justify-center">
+<svg class="w-full h-5" viewbox="0 0 40 10">
+<line stroke="#234135" stroke-dasharray="3,3" stroke-width="2" x1="0" x2="33" y1="5" y2="5"></line>
+<polygon fill="#234135" points="33,1 40,5 33,9"></polygon>
+</svg>
+</div>
+<!-- Node 4: DuckDB Receiver -->
+<div class="col-span-1 bg-crt-900/60 border border-crt-700/60 rounded p-2 text-center text-emerald-800">
+<div class="text-xs font-bold mono truncate">DUCKDB</div>
+<div class="text-[9px] mono mt-0.5">STANDBY</div>
+<div class="w-full bg-crt-800 h-1.5 rounded mt-1.5"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- MIDDLE SECTION: 6-PANEL ANALOG OSCILLOSCOPE GRATICULE INSTRUMENTS (~515px) -->
+<div class="relative z-10 flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 my-2.5 min-h-0">
+<!-- INSTRUMENT 1: AM4 GPU COMPUTE OSCILLOSCOPE (3.5px Glowing Vector Trace) -->
+<div class="bg-crt-950 border border-crt-700 rounded p-2.5 flex flex-col justify-between relative shadow-[inset_0_0_15px_rgba(0,0,0,0.7)]">
+<div class="flex items-center justify-between border-b border-crt-800 pb-1.5 mb-1.5">
+<div class="flex items-center gap-1.5 mono">
+<span class="w-2.5 h-2.5 rounded-full bg-crt-green phosphor-glow-green"></span>
+<span class="text-xs font-bold text-white uppercase tracking-wider">CH-1: AM4 RTX 3090 COMPUTE</span>
+</div>
+<span class="jb-mono text-base font-extrabold text-crt-green tabular text-glow-green" id="cardGpuPct">94%</span>
+</div>
+<!-- Oscilloscope Vector Screen with Phosphor Graticule -->
+<div class="relative flex-1 bg-crt-900/90 border border-crt-800 rounded p-1 flex items-end overflow-hidden">
+<div class="absolute inset-0 crt-graticule-dense opacity-45 pointer-events-none"></div>
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 300 100">
+<defs>
+<lineargradient id="crtGreenFill" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#00ff88" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#00ff88" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Vector Trace Fill -->
+<polygon fill="url(#crtGreenFill)" id="cardGpuPoly" points="0,100 0,82 30,72 60,65 90,38 120,28 150,15 180,12 210,9 240,7 270,6 300,5 300,100"></polygon>
+<!-- Phosphor Primary Trace: 3.5px line width when active -->
+<path class="phosphor-glow-green" d="M0,82 Q30,72 60,65 T120,28 T180,12 T240,7 L300,5" fill="none" id="pathGpuLine" stroke="#00ff88" stroke-linecap="round" stroke-width="3.5"></path>
+<!-- 100% Saturation threshold line -->
+<line opacity="0.75" stroke="#ff3344" stroke-dasharray="3,3" stroke-width="1.2" x1="0" x2="300" y1="4" y2="4"></line>
+</svg>
+<div class="absolute top-1 left-2 text-[9px] mono text-emerald-600 font-bold">100mV / DIV • 60s SWEEP</div>
+<div class="absolute top-1 right-2 text-[9px] mono text-crt-crimson font-bold">100% CEIL</div>
+</div>
+<!-- Segmented Bar Array & Microtelemetry -->
+<div class="mt-2 space-y-1">
+<div class="seg-bar" id="segGpu">
+<div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div>
+<div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip"></div>
+</div>
+<div class="flex justify-between text-[10px] mono text-emerald-400/80 tabular pt-0.5">
+<span>CORE: <strong class="text-crt-amber">68°C</strong> / SPOT: <strong class="text-crt-amber">79°C</strong></span>
+<span>FLUX DRAW: <strong class="text-white">328W</strong> / 350W</span>
+</div>
+</div>
+</div>
+<!-- INSTRUMENT 2: VRAM PRESSURE & RADIAL ARC SATURATION (Amber Radiation Surge) -->
+<div class="bg-crt-950 border border-crt-amber/80 rounded p-2.5 flex flex-col justify-between relative shadow-[inset_0_0_15px_rgba(255,170,0,0.1)]">
+<div class="flex items-center justify-between border-b border-crt-800 pb-1.5 mb-1.5">
+<div class="flex items-center gap-1.5 mono">
+<span class="w-2.5 h-2.5 rounded-full bg-crt-amber phosphor-glow-amber animate-pulse"></span>
+<span class="text-xs font-bold text-white uppercase tracking-wider">CH-2: VRAM PRESSURE TRACE</span>
+</div>
+<span class="jb-mono text-base font-extrabold text-crt-amber tabular text-glow-amber" id="cardVramPct">88%</span>
+</div>
+<div class="relative flex-1 bg-crt-900/90 border border-crt-800 rounded p-1 flex items-end overflow-hidden">
+<div class="absolute inset-0 crt-graticule-dense opacity-45 pointer-events-none"></div>
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 300 100">
+<defs>
+<lineargradient id="crtAmberFill" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ffaa00" stop-opacity="0.32"></stop>
+<stop offset="100%" stop-color="#ffaa00" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<polygon fill="url(#crtAmberFill)" points="0,100 0,60 40,55 80,45 120,38 160,25 200,20 240,16 280,14 300,12 300,100"></polygon>
+<path class="phosphor-glow-amber" d="M0,60 L40,55 L80,45 L120,38 L160,25 L200,20 L240,16 L280,14 L300,12" fill="none" stroke="#ffaa00" stroke-width="3.0"></path>
+<line stroke="#ff3344" stroke-dasharray="3,2" stroke-width="1.4" x1="0" x2="300" y1="6" y2="6"></line>
+</svg>
+<div class="absolute top-1 left-2 text-[9px] mono text-crt-amber font-bold">WARNING: HEADROOM COMPRESSED</div>
+<div class="absolute top-1 right-2 text-[9px] mono text-crt-crimson font-bold">24.0 GB LIMIT</div>
+</div>
+<div class="mt-2 space-y-1">
+<div class="seg-bar" id="segVram">
+<div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div>
+<div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip c-amber"></div><div class="seg-pip"></div><div class="seg-pip"></div>
+</div>
+<div class="flex justify-between text-[10px] mono text-emerald-400/80 tabular pt-0.5">
+<span>WEIGHTS: <strong class="text-white">14.8G</strong> • KV: <strong class="text-crt-amber">6.4G</strong></span>
+<span>MARGIN: <strong class="text-crt-green">2.8 GB REMAIN</strong></span>
+</div>
+</div>
+</div>
+<!-- INSTRUMENT 3: OMEN WORKSTATION (DUAL BEAM JEPA NPU & HOST CPU) -->
+<div class="bg-crt-950 border border-crt-700 rounded p-2.5 flex flex-col justify-between">
+<div class="flex items-center justify-between border-b border-crt-800 pb-1.5 mb-1.5">
+<div class="flex items-center gap-1.5 mono">
+<span class="w-2.5 h-2.5 rounded-full bg-crt-cyan phosphor-glow-cyan"></span>
+<span class="text-xs font-bold text-white uppercase tracking-wider">CH-3: OMEN NPU + HOST TRACE</span>
+</div>
+<div class="mono text-xs tabular text-right">
+<span class="text-crt-cyan font-bold text-glow-cyan">NPU 42%</span> • <span class="text-emerald-400 font-bold">CPU 28%</span>
+</div>
+</div>
+<div class="relative flex-1 bg-crt-900/90 border border-crt-800 rounded p-1 flex items-end overflow-hidden">
+<div class="absolute inset-0 crt-graticule-dense opacity-45 pointer-events-none"></div>
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 300 100">
+<!-- Trace A: JEPA NPU Beam (Electric Cyan) -->
+<path class="phosphor-glow-cyan" d="M0,85 L30,80 L60,40 L90,42 L120,40 L150,75 L180,45 L210,40 L240,43 L270,41 L300,42" fill="none" stroke="#00e5ff" stroke-width="2.2"></path>
+<!-- Trace B: Host CPU (Phosphor Emerald baseline) -->
+<path d="M0,75 L30,73 L60,70 L90,72 L120,68 L150,72 L180,70 L210,69 L240,71 L270,72 L300,72" fill="none" opacity="0.6" stroke="#00ff88" stroke-width="1.2"></path>
+</svg>
+<div class="absolute top-1 left-2 text-[9px] mono text-crt-cyan">DUAL-TRACE POLARITY</div>
+<div class="absolute top-1 right-2 text-[9px] mono text-emerald-500">JEPA EMBED SWEEP</div>
+</div>
+<div class="mt-2 space-y-1">
+<div class="seg-bar">
+<div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip"></div>
+<div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div>
+</div>
+<div class="flex justify-between text-[10px] mono text-emerald-400/80 tabular pt-0.5">
+<span>HOST DDR5: <strong class="text-white">22.4G / 64G</strong></span>
+<span>DIE TEMP: <strong class="text-crt-green">52°C (STABLE)</strong></span>
+</div>
+</div>
+</div>
+<!-- INSTRUMENT 4: TOKEN THROUGHPUT OSCILLATION (CADENCE RATE) -->
+<div class="bg-crt-950 border border-crt-700 rounded p-2.5 flex flex-col justify-between">
+<div class="flex items-center justify-between border-b border-crt-800 pb-1.5 mb-1.5">
+<div class="flex items-center gap-1.5 mono">
+<span class="w-2.5 h-2.5 rounded-full bg-crt-cyan phosphor-glow-cyan"></span>
+<span class="text-xs font-bold text-white uppercase tracking-wider">CH-4: CADENCE RATE (TOK/S)</span>
+</div>
+<span class="jb-mono text-base font-extrabold text-white tabular text-glow-cyan" id="cardCadenceVal">14.8 <span class="text-xs text-crt-cyan">t/s</span></span>
+</div>
+<div class="relative flex-1 bg-crt-900/90 border border-crt-800 rounded p-1 flex items-end overflow-hidden">
+<div class="absolute inset-0 crt-graticule-dense opacity-45 pointer-events-none"></div>
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 300 100">
+<defs>
+<lineargradient id="crtCyanFill" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#00e5ff" stop-opacity="0.25"></stop>
+<stop offset="100%" stop-color="#00e5ff" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<polygon fill="url(#crtCyanFill)" points="0,100 0,95 20,95 40,25 70,22 100,24 130,22 160,24 190,21 220,23 250,22 280,21 300,22 300,100"></polygon>
+<path class="phosphor-glow-cyan" d="M0,95 L20,95 L40,25 L70,22 L100,24 L130,22 L160,24 L190,21 L220,23 L250,22 L280,21 L300,22" fill="none" stroke="#00e5ff" stroke-width="2.4"></path>
+</svg>
+<div class="absolute top-1 left-2 text-[9px] mono text-emerald-500">TTFT 210ms (WARM PREFIX)</div>
+<div class="absolute top-1 right-2 text-[9px] mono text-crt-cyan">PEAK: 15.2 t/s</div>
+</div>
+<div class="mt-2 space-y-1">
+<div class="seg-bar">
+<div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div>
+<div class="seg-pip c-cyan"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div>
+</div>
+<div class="flex justify-between text-[10px] mono text-emerald-400/80 tabular pt-0.5">
+<span>TOTAL EMITTED: <strong class="text-white">3,248 TOK</strong></span>
+<span>JITTER: <strong class="text-crt-green">± 0.4 t/s</strong></span>
+</div>
+</div>
+</div>
+<!-- INSTRUMENT 5: RADIAL ARC METERS & DUAL KV CACHE RESIDENCE -->
+<div class="bg-crt-950 border border-crt-700 rounded p-2.5 flex flex-col justify-between">
+<div class="flex items-center justify-between border-b border-crt-800 pb-1.5 mb-1.5">
+<div class="flex items-center gap-1.5 mono">
+<span class="w-2.5 h-2.5 rounded-full bg-crt-green phosphor-glow-green"></span>
+<span class="text-xs font-bold text-white uppercase tracking-wider">CH-5: CACHE FLUX &amp; RADIALS</span>
+</div>
+<span class="mono text-xs font-bold text-crt-green tabular text-glow-green">~62% EFFICIENCY GAIN</span>
+</div>
+<div class="relative flex-1 bg-crt-900/90 border border-crt-800 rounded p-2 flex items-center justify-between gap-3">
+<!-- Dual Circular Radial Arc Meters for Instant Glanceability -->
+<div class="flex items-center gap-3">
+<!-- Radial 1: AST Context 100% -->
+<div class="relative flex flex-col items-center">
+<svg class="w-16 h-16" viewbox="0 0 100 100">
+<circle class="radial-bg" cx="50" cy="50" fill="none" r="40" stroke-width="8"></circle>
+<circle class="radial-prog phosphor-glow-green" cx="50" cy="50" fill="none" r="40" stroke="#00ff88" stroke-dashoffset="0" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-[11px] font-black text-crt-green mono">100%</span>
+</div>
+<span class="text-[8px] mono text-emerald-400 mt-0.5">AST PACK</span>
+</div>
+<!-- Radial 2: Prefix KV 78% -->
+<div class="relative flex flex-col items-center">
+<svg class="w-16 h-16" viewbox="0 0 100 100">
+<circle class="radial-bg" cx="50" cy="50" fill="none" r="40" stroke-width="8"></circle>
+<!-- 78% of 251.2 = 195.9 offset = 55.3 -->
+<circle class="radial-prog phosphor-glow-cyan" cx="50" cy="50" fill="none" r="40" stroke="#00e5ff" stroke-dashoffset="55.3" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-[11px] font-black text-crt-cyan mono">78%</span>
+</div>
+<span class="text-[8px] mono text-crt-cyan mt-0.5">KV PREFIX</span>
+</div>
+</div>
+<!-- Linear Readout Cluster -->
+<div class="flex-1 space-y-1.5 text-[10px] mono">
+<div class="flex justify-between border-b border-crt-800 pb-0.5">
+<span class="text-emerald-500">EXACT AST:</span>
+<span class="text-crt-green font-bold">12.5k TOK (HIT)</span>
+</div>
+<div class="flex justify-between border-b border-crt-800 pb-0.5">
+<span class="text-emerald-500">PREFIX SLOT #2:</span>
+<span class="text-crt-cyan font-bold">9.7k / 12.5k</span>
+</div>
+<div class="flex justify-between">
+<span class="text-emerald-500">ONTOLOGY RULES:</span>
+<span class="text-crt-amber font-bold">14 APPLIED (2 OMITS)</span>
+</div>
+</div>
+</div>
+<div class="mt-2 space-y-1">
+<div class="seg-bar">
+<div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip c-cyan"></div>
+<div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip c-cyan"></div><div class="seg-pip"></div><div class="seg-pip"></div>
+</div>
+<div class="flex justify-between text-[10px] mono text-emerald-400/80 tabular pt-0.5">
+<span>TIME SAVED: <strong class="text-crt-green">4.2 SECONDS</strong></span>
+<span>HASH: <strong class="text-emerald-300">c901a:ok</strong></span>
+</div>
+</div>
+</div>
+<!-- INSTRUMENT 6: HARNESS TOPOLOGY BUS, DISK I/O & FX99 ROUTER -->
+<div class="bg-crt-950 border border-crt-700 rounded p-2.5 flex flex-col justify-between">
+<div class="flex items-center justify-between border-b border-crt-800 pb-1.5 mb-1.5">
+<div class="flex items-center gap-1.5 mono">
+<span class="w-2.5 h-2.5 rounded-full bg-crt-green phosphor-glow-green"></span>
+<span class="text-xs font-bold text-white uppercase tracking-wider">CH-6: HARNESS BUS &amp; LINK OSC</span>
+</div>
+<span class="mono text-xs font-bold text-crt-green tabular text-glow-green">0.18ms DIRECT LINK</span>
+</div>
+<div class="relative flex-1 bg-crt-900/90 border border-crt-800 rounded p-1 flex items-end overflow-hidden">
+<div class="absolute inset-0 crt-graticule-dense opacity-45 pointer-events-none"></div>
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 300 100">
+<!-- Ethernet Direct Trace (Green) -->
+<path class="phosphor-glow-green" d="M0,80 L25,82 L50,80 L75,70 L100,82 L125,78 L150,81 L175,72 L200,80 L225,82 L250,75 L275,81 L300,80" fill="none" stroke="#00ff88" stroke-width="1.8"></path>
+<!-- NVMe IO (Cyan) -->
+<path d="M0,95 L40,95 L70,88 L100,95 L140,84 L170,95 L200,88 L230,95 L260,95 L300,90" fill="none" stroke="#00e5ff" stroke-width="1.2"></path>
+</svg>
+<div class="absolute top-1 left-2 text-[9px] mono text-emerald-500">DIRECT ETH WIRE: OMEN ↔ AM4</div>
+<div class="absolute top-1 right-2 text-[9px] mono text-crt-green">0 PACKET LOSS</div>
+</div>
+<div class="mt-2 space-y-1">
+<div class="seg-bar">
+<div class="seg-pip c-green"></div><div class="seg-pip c-green"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div>
+<div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div><div class="seg-pip"></div>
+</div>
+<div class="flex justify-between text-[10px] mono text-emerald-400/80 tabular pt-0.5">
+<span>NVME IO: <strong class="text-white">18.4 MB/s</strong></span>
+<span>FX99 ROUTER: <strong class="text-emerald-600">IDLE LOAD (0.12)</strong></span>
+</div>
+</div>
+</div>
+</div>
+<!-- BOTTOM SECTION: ARTIFACT PRODUCED & EVENT RING RECORDER (~125px) -->
+<div class="relative z-10 flex-none grid grid-cols-1 md:grid-cols-12 gap-3 pt-1 border-t border-crt-800">
+<!-- Produced Parquet Concrete Artifact (Col 5) -->
+<div class="md:col-span-5 bg-crt-950 border border-crt-700 rounded p-2 flex flex-col justify-between">
+<div class="flex items-center justify-between text-[10px] mono">
+<span class="text-emerald-500 uppercase tracking-wider">CONCRETE ARTIFACT SINK</span>
+<span class="text-crt-green font-bold text-glow-green">READY (+14 SCHEMA ROWS)</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-crt-green text-base phosphor-glow-green">terminal</span>
+<div class="jb-mono text-xs font-bold text-white truncate">duckdb_rel_catalog_v14.parquet</div>
+</div>
+<div class="flex items-center justify-between text-[10px] mono text-emerald-400/80 mt-1">
+<span>SIZE: <strong class="text-slate-200">142 KB</strong></span>
+<span>SHA256: <strong class="text-slate-200">7f3b890a..</strong></span>
+<span>MERGE: <strong class="text-crt-green">CONFIRMED</strong></span>
+</div>
+</div>
+<!-- Ring Buffer History Stream (Col 7) -->
+<div class="md:col-span-7 bg-crt-950 border border-crt-700 rounded p-2 flex flex-col justify-between">
+<div class="flex items-center justify-between text-[10px] mono">
+<span class="text-emerald-500 uppercase tracking-wider">EVENT RING AUDIT BUFFER (LAST 3 EPOCHS)</span>
+<span class="text-emerald-600">REC BUFFER 50</span>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-1 mono text-[10px]" id="expandedHistoryList">
+<div class="bg-crt-900 border border-emerald-800/80 rounded p-1.5">
+<div class="flex items-center justify-between text-crt-green font-bold">
+<span>✓ #4091</span>
+<span class="text-[9px] text-emerald-600">4m ago</span>
+</div>
+<div class="text-slate-200 truncate text-[10px]">build_duckdb_snap</div>
+<div class="text-[9px] text-emerald-400/80 mt-0.5">3/3 Checks OK</div>
+</div>
+<div class="bg-crt-900 border border-crt-amber/70 rounded p-1.5">
+<div class="flex items-center justify-between text-crt-amber font-bold text-glow-amber">
+<span>↻ #4090</span>
+<span class="text-[9px] text-emerald-600">20m ago</span>
+</div>
+<div class="text-slate-200 truncate text-[10px]">npu_embed_jepa_b9</div>
+<div class="text-[9px] text-crt-amber mt-0.5">Retry #1 Recovered</div>
+</div>
+<div class="bg-crt-900 border border-crt-800 rounded p-1.5">
+<div class="flex items-center justify-between text-crt-green font-bold">
+<span>✓ #4089</span>
+<span class="text-[9px] text-emerald-600">37m ago</span>
+</div>
+<div class="text-slate-200 truncate text-[10px]">ast_grammar_parse</div>
+<div class="text-[9px] text-emerald-400/80 mt-0.5">Auto-Adopted</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- INTERACTIVE OSCILLOSCOPE SCRIPT -->
+<script>
+  // Mode switcher: Expanded 1400x900 vs Horizontal Ribbon Strip 1400x140
+  function setViewMode(mode) {
+    const exp = document.getElementById('expandedContainer');
+    const rib = document.getElementById('ribbonStripContainer');
+    const bExp = document.getElementById('viewBtnExpanded');
+    const bRib = document.getElementById('viewBtnRibbon');
+
+    if (mode === 'ribbon') {
+      exp.classList.add('hidden');
+      rib.classList.remove('hidden');
+      bRib.className = "flex items-center gap-1.5 px-3 py-0.5 rounded bg-crt-green text-crt-950 font-bold transition shadow-[0_0_8px_rgba(0,255,136,0.6)]";
+      bExp.className = "flex items-center gap-1.5 px-3 py-0.5 rounded text-emerald-400/70 hover:text-crt-green hover:bg-crt-800 transition";
+    } else {
+      rib.classList.add('hidden');
+      exp.classList.remove('hidden');
+      bExp.className = "flex items-center gap-1.5 px-3 py-0.5 rounded bg-crt-green text-crt-950 font-bold transition shadow-[0_0_8px_rgba(0,255,136,0.6)]";
+      bRib.className = "flex items-center gap-1.5 px-3 py-0.5 rounded text-emerald-400/70 hover:text-crt-green hover:bg-crt-800 transition";
+    }
+  }
+
+  // Interactive Scenario Controller
+  function setScenario(type) {
+    ['active', 'blocked', 'idle'].forEach(t => {
+      const b = document.getElementById('btn-s-' + t);
+      if (b) {
+        b.className = "px-2.5 py-0.5 rounded bg-crt-850 text-emerald-400/70 border border-crt-700 hover:text-white hover:border-crt-green/50 transition";
+      }
+    });
+    const currentBtn = document.getElementById('btn-s-' + type);
+    if (currentBtn) {
+      currentBtn.className = "px-2.5 py-0.5 rounded bg-crt-green text-crt-950 border border-crt-green font-bold shadow-[0_0_8px_rgba(0,255,136,0.5)] transition";
+    }
+
+    const mainPill = document.getElementById('mainJobStatusPill');
+    const mainTitle = document.getElementById('mainJobTitle');
+    const mainBottleneckBox = document.getElementById('mainBottleneckBox');
+    const mainBottleneckLabel = document.getElementById('mainBottleneckLabel');
+    const mainTokRate = document.getElementById('mainTokRate');
+    const cardGpuPct = document.getElementById('cardGpuPct');
+    const pathGpuLine = document.getElementById('pathGpuLine');
+    const flowStatusLabel = document.getElementById('flowStatusLabel');
+    const flowAM4Rate = document.getElementById('flowAM4Rate');
+    const ribbonLed = document.getElementById('ribbonLed');
+    const ribbonJobId = document.getElementById('ribbonJobId');
+    const ribbonJobTag = document.getElementById('ribbonJobTag');
+    const ribbonGpuPct = document.getElementById('ribbonGpuPct');
+    const ribbonBottleneck = document.getElementById('ribbonBottleneck');
+    const ribbonRate = document.getElementById('ribbonRate');
+    const ribbonGpuWave = document.getElementById('ribbonGpuWave');
+
+    if (type === 'active') {
+      mainPill.className = "mono text-xs px-2.5 py-0.5 rounded bg-emerald-950 text-crt-green border border-crt-green/80 font-bold flex items-center gap-1.5 shadow-[0_0_8px_rgba(0,255,136,0.3)] text-glow-green";
+      mainPill.innerHTML = '<span class="w-2 h-2 rounded-full bg-crt-green animate-ping"></span> ACTIVE #4092';
+      mainTitle.innerText = "extract_table_relationships_am4";
+      mainBottleneckBox.className = "bg-amber-950/60 border border-crt-amber px-3 py-1 rounded flex items-center gap-2 shadow-[0_0_8px_rgba(255,170,0,0.2)]";
+      mainBottleneckLabel.innerText = "AM4 VRAM 88% (21.2 / 24.0 GB)";
+      mainTokRate.innerText = "14.8 tok/s";
+      cardGpuPct.innerText = "94%";
+      pathGpuLine.setAttribute('stroke-width', '3.5');
+      pathGpuLine.setAttribute('stroke', '#00ff88');
+      flowStatusLabel.innerText = "PHASE 03: AM4 3090 COMPUTE SATURATED (BEAM INTENSITY 94%)";
+      flowAM4Rate.innerText = "14.8 tok/s • UTIL 94% • VRAM 88%";
+
+      ribbonLed.className = "w-2.5 h-2.5 rounded-full bg-crt-green phosphor-glow-green animate-ping";
+      ribbonJobId.innerText = "#4092";
+      ribbonJobTag.innerText = "SWEEP ACTIVE";
+      ribbonGpuPct.innerText = "94%";
+      ribbonBottleneck.innerHTML = '<span class="w-2 h-2 rounded-full bg-crt-amber animate-pulse"></span> VRAM 88% (SATURATING)';
+      ribbonRate.innerText = "14.8 tok/s";
+      ribbonGpuWave.setAttribute('stroke-width', '3.5');
+      ribbonGpuWave.setAttribute('stroke', '#00ff88');
+
+    } else if (type === 'blocked') {
+      mainPill.className = "mono text-xs px-2.5 py-0.5 rounded bg-amber-950 text-crt-amber border border-crt-amber font-bold flex items-center gap-1.5 shadow-[0_0_8px_rgba(255,170,0,0.3)] text-glow-amber";
+      mainPill.innerHTML = '<span class="w-2 h-2 rounded-full bg-crt-amber"></span> STALLED #4092';
+      mainTitle.innerText = "extract_table_relationships_am4 [STALLED]";
+      mainBottleneckBox.className = "bg-red-950/70 border border-crt-crimson px-3 py-1 rounded flex items-center gap-2 shadow-[0_0_8px_rgba(255,51,68,0.3)]";
+      mainBottleneckLabel.innerText = "PG-SQL POOL EXHAUSTION (WAIT_EVENT 14s)";
+      mainTokRate.innerText = "0.0 tok/s";
+      cardGpuPct.innerText = "0%";
+      pathGpuLine.setAttribute('stroke-width', '1.5');
+      pathGpuLine.setAttribute('stroke', '#ffaa00');
+      flowStatusLabel.innerText = "STALLED: WAITING ON POSTGRESQL CONNECTION SLOT";
+      flowAM4Rate.innerText = "0.0 tok/s • STALLED • WAITING FOR INPUT STREAM";
+
+      ribbonLed.className = "w-2.5 h-2.5 rounded-full bg-crt-amber phosphor-glow-amber";
+      ribbonJobId.innerText = "#4092";
+      ribbonJobTag.innerText = "STALLED";
+      ribbonGpuPct.innerText = "0%";
+      ribbonBottleneck.innerHTML = '<span class="w-2 h-2 rounded-full bg-crt-crimson"></span> PG-SQL POOL FULL';
+      ribbonRate.innerText = "0.0 tok/s";
+      ribbonGpuWave.setAttribute('stroke-width', '1.5');
+      ribbonGpuWave.setAttribute('stroke', '#ffaa00');
+
+    } else if (type === 'idle') {
+      mainPill.className = "mono text-xs px-2.5 py-0.5 rounded bg-crt-850 text-emerald-500 border border-crt-700 font-bold flex items-center gap-1.5";
+      mainPill.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-700"></span> STANDBY IDLE';
+      mainTitle.innerText = "Telemetry Harness Online — Listening on Bus";
+      mainBottleneckBox.className = "bg-crt-950 border border-crt-700 px-3 py-1 rounded flex items-center gap-2";
+      mainBottleneckLabel.innerText = "NOMINAL (NO ACTIVE SATURATION)";
+      mainTokRate.innerText = "—";
+      cardGpuPct.innerText = "0%";
+      pathGpuLine.setAttribute('stroke-width', '1.5');
+      pathGpuLine.setAttribute('stroke', '#234135');
+      flowStatusLabel.innerText = "STANDBY: ALL NODES AT MINIMUM PHOSPHOR HUM";
+      flowAM4Rate.innerText = "0.0 tok/s • IDLE 0% UTIL";
+
+      ribbonLed.className = "w-2.5 h-2.5 rounded-full bg-emerald-700";
+      ribbonJobId.innerText = "STANDBY";
+      ribbonJobTag.innerText = "READY";
+      ribbonGpuPct.innerText = "0%";
+      ribbonBottleneck.innerHTML = '<span class="w-2 h-2 rounded-full bg-crt-green"></span> IDLE / READY';
+      ribbonRate.innerText = "0.0";
+      ribbonGpuWave.setAttribute('stroke-width', '1.5');
+      ribbonGpuWave.setAttribute('stroke', '#234135');
+    }
+  }
+</script>
+</body></html>
