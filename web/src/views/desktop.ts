@@ -9,7 +9,7 @@ export function header(): HTMLElement {
   return h("header", { class: "hdr" },
     h("div", { class: "hdr-row" },
       h("span", { class: "brand" }, h("span", { class: "brand-dot", "aria-hidden": "true" }), "PITWALL"),
-      hostDots(state.snapshot), demoTag(), freshness(state.snapshot), controls()));
+      hostDots(state.snapshot), demoTag(), freshness(state.snapshot, true), controls()));
 }
 
 export function desktop(): HTMLElement {

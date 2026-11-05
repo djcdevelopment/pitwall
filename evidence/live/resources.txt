@@ -1,3 +1,5 @@
 Scope: Pitwall service process, measured from /proc over 60 s with one or zero browser clients.
 tui_cache path: self_cpu_pct=1.23 reaped_children_cpu_pct=0.00 rss_mib_min=58.4 rss_mib_max=58.4 seconds=60
 self_refresh path (private cache paths; collectors run as subprocesses): self_cpu_pct=1.28 reaped_children_cpu_pct=2.93 rss_mib_min=52.8 rss_mib_max=52.9 seconds=60
+Not measured: standalone collection with both TUIs closed. The self_refresh figure was taken with the TUIs running, so collectors could reuse a cache under 1.5 s old.
+Browser, separately: headless Chromium, live desktop, 60 s: 1.0% CPU, 2.0 MiB JS heap. JS heap is not total browser memory.

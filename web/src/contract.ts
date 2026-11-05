@@ -28,6 +28,15 @@ export interface Measurement {
   note: string;
 }
 
+export interface CollectorVersion {
+  repo: string;
+  commit: string | null;
+  dirty: boolean | null;
+  changed_files: string[];
+  checked_at: string;
+  note: string;
+}
+
 export interface SourceRecord {
   id: string;
   label: string;
@@ -38,6 +47,7 @@ export interface SourceRecord {
   age_s: number | null;
   stale_after_s: number;
   last_error: string;
+  version: CollectorVersion | null;
 }
 
 export interface Host {
@@ -177,6 +187,7 @@ export interface Routing {
 export interface Correction {
   field: string;
   displayed_value: string;
+  basis_label: string;
   producer_value: string;
   source: string;
   note: string;

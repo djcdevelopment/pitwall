@@ -24,6 +24,9 @@ function render(): void {
   const fid = active?.getAttribute("data-fid") ?? null;
   const selStart = (active as HTMLInputElement | null)?.selectionStart;
   const sy = window.scrollY;
+  // The drawer is rebuilt with the page, so its scroll positions must survive each new sample.
+  const DRAWER_SCROLLERS = [".ev-drawer", ".ev-body", ".ev-pre"];
+  const drawerScroll = DRAWER_SCROLLERS.map((q) => app.querySelector(q)?.scrollTop ?? 0);
 
   const view = state.view === "strip" ? strip() : state.view === "narrow" ? narrow() : desktop();
   const nodes: Node[] = [view];
@@ -35,9 +38,10 @@ function render(): void {
   }
   app.replaceChildren(...nodes);
   window.scrollTo(0, sy);
+  DRAWER_SCROLLERS.forEach((q, i) => { const el = app.querySelector(q); if (el) el.scrollTop = drawerScroll[i]; });
 
   if (ev.open) {
-    if (ev.section) { app.querySelector(`.ev-body [data-sec="${ev.section}"]`)?.scrollIntoView({ block: "start" }); ev.section = null; }
+    if (ev.section && !ev.loading) { app.querySelector(`.ev-body [data-sec="${ev.section}"]`)?.scrollIntoView({ block: "start" }); ev.section = null; }
     if (ev.focusDrawer) { document.getElementById("ev-close")?.focus(); ev.focusDrawer = false; }
     else if (fid) (app.querySelector(`.ev-drawer [data-fid="${CSS.escape(fid)}"]`) as HTMLElement | null)?.focus();
     lastEvidenceOpen = true;

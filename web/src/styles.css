@@ -425,5 +425,17 @@ html[data-view="desktop"] body { padding: 6px 10px; font-size: 12px; line-height
 .view-desktop .bottom { height: 216px; } .view-desktop .bottom > * { height: auto; min-height: 0; overflow: auto; }
 .foot { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .view-narrow .foot { white-space: normal; }
-/* Each seat row carries its own stale badge; repeating the age in tight columns collides. */
-.view-desktop .seat-r .rd-stale, .view-desktop .seat-q .rd-stale { display: none; }
+/* Desktop instruments keep their place when telemetry goes stale: the row or device badge says
+   "stale", the header carries the age, and each reading shrinks to its glyph in reserved space. */
+.view-desktop .rd-stale { font-size: 0; margin-left: 1px; } .view-desktop .rd-stale .glyph { font-size: 10px; }
+.view-desktop .seat { grid-template-columns: minmax(0, 1fr) 62px 76px 66px 56px; }
+.view-desktop .seat-r, .view-desktop .seat-o, .view-desktop .seat-q { overflow: hidden; white-space: nowrap; }
+.view-desktop .dev-pt { flex-wrap: nowrap; }
+.view-desktop .taskbar { height: 64px; }
+.view-desktop .tb-1 { min-height: 34px; }
+.tb-1 .exc-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tb-1 .exc-s { white-space: nowrap; }
+.vchip { background: none; border: 1px solid var(--p700); border-radius: 3px; color: var(--txt2); font: inherit; font-size: 10.5px; padding: 0 4px; margin-left: 4px; cursor: pointer; white-space: nowrap; }
+.vchip-warn { color: var(--amber); border-color: rgba(255,170,0,.5); }
+.view-narrow .vchip { min-height: 44px; min-width: 44px; font-size: 13px; }
+.view-desktop .bottom { height: 208px; }

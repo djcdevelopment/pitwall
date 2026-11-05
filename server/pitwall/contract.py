@@ -50,6 +50,17 @@ class Measurement(BaseModel):
     note: str = ""
 
 
+class CollectorVersion(BaseModel):
+    """State of an external collector's checkout. Pitwall's own commit does not pin it."""
+
+    repo: str
+    commit: Optional[str] = None
+    dirty: Optional[bool] = None  # null means unknown
+    changed_files: list[str] = Field(default_factory=list)
+    checked_at: str = ""
+    note: str = ""
+
+
 class SourceRecord(BaseModel):
     id: str  # fleet | flow | receipts
     label: str
@@ -60,6 +71,7 @@ class SourceRecord(BaseModel):
     age_s: Optional[float] = None
     stale_after_s: float
     last_error: str = ""
+    version: Optional[CollectorVersion] = None
 
 
 class Host(BaseModel):
@@ -203,6 +215,7 @@ class Routing(BaseModel):
 class Correction(BaseModel):
     field: str
     displayed_value: str
+    basis_label: str = ""  # how the displayed value is known, e.g. "review-reported correction"
     producer_value: str
     source: str
     note: str = ""

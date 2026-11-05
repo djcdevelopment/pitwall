@@ -25,6 +25,7 @@ from .sources import CacheSource, SourceState
 from .sources import fleet as fleet_src
 from .sources import flow as flow_src
 from .sources.receipts import ReceiptReader
+from .sources.version import read_version
 from .util import iso_from_epoch, now_iso
 
 _VOLATILE = {"generated_at", "read_at", "age_s"}
@@ -64,6 +65,7 @@ class Store:
         self._fleet_seen = -1
         self._flow_seen = -1
         self._stop = threading.Event()
+        self._versions: dict[str, tuple[float, object]] = {}
         self._threads: list[threading.Thread] = []
 
     # -- lifecycle -----------------------------------------------------------------------------
@@ -94,6 +96,13 @@ class Store:
             except Exception:  # noqa: BLE001
                 pass
 
+    def _version(self, repo: str, now: float):
+        seen = self._versions.get(repo)
+        if seen is None or now - seen[0] >= self.cfg.version_ttl_s:
+            seen = (now, read_version(repo, now))
+            self._versions[repo] = seen
+        return seen[1]
+
     # -- build ---------------------------------------------------------------------------------
     def rebuild(self, blocking: bool = True) -> None:
         if not self._build_lock.acquire(blocking=blocking):
@@ -102,6 +111,7 @@ class Store:
             now = time.time()
             fl, fw = self.fleet.state, self.flow.state
             fleet_rec, flow_rec = source_record(fl, now), source_record(fw, now)
+            fleet_rec.version, flow_rec.version = self._version(self.cfg.fleet_repo, now), self._version(self.cfg.flow_repo, now)
             flow_tasks = [t for t in ((fw.data or {}).get("tasks") or []) if isinstance(t, dict)][:10]
             tasks = [(str(t.get("task_id")), str(t.get("run_dir") or "")) for t in flow_tasks]
             names = self.evidence.refresh(tasks)

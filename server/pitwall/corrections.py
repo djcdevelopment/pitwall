@@ -40,9 +40,10 @@ def apply_fraction(
             value=f"{num}/{den}", unit="facts", observed_at=None, read_at=read_at,
             source="correction: " + str(row.get("source", ""))[:160], status="ok", scope="job",
             numerator=num, denominator=den,
-            note=f"{num}/{den} (reviewed); producer record: {row.get('producer_value', '')}, superseded",
+            note=f"{num}/{den}, {row.get('basis_label', 'corrected')}; producer record: {row.get('producer_value', '')}",
         )
         corr = Correction(field=field, displayed_value=str(row.get("displayed_value", f"{num}/{den}")),
+                          basis_label=str(row.get("basis_label", "")),
                           producer_value=str(row.get("producer_value", producer.value if producer.value is not None else "")),
                           source=str(row.get("source", "")), note=str(row.get("note", "")))
         return shown, [corr]

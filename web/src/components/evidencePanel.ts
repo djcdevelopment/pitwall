@@ -1,7 +1,7 @@
 import { h } from "../dom";
 import type { Snapshot, Task } from "../contract";
 import type { EvidenceState } from "../store";
-import { badge, fromParticipation } from "./badge";
+import { badge, fromActivity, fromParticipation } from "./badge";
 import { fmtBytes } from "../format";
 import { servicesList } from "./channels";
 
@@ -22,12 +22,12 @@ export function evidencePanel(ev: EvidenceState, sn: Snapshot, task: Task | null
       h("div", { class: "ev-line dim" }, "basis: ", hop.basis || "none recorded")));
     const cx = task.context, d = task.duckdb;
     const add = (l: string, v: string) => { if (v) notes.push(`${l}: ${v}`); };
-    add("Pack cache", task.caches.pack_cache.note); add("AST/RAM", task.caches.ast_ram.note); add("Model KV", task.caches.model_kv.note);
+    add("Pack cache", task.caches.pack_cache.note); add("AST/RAM", task.caches.ast_ram.note); add("Cached input tokens or prefix reuse, per job", task.caches.model_kv.note);
     add("Context concept", cx.concept); add("Selected pack sha256", cx.selected_pack_sha256); add("Comparison", cx.comparison_note);
     add("DuckDB source snapshot read", d.source_snapshot_detail); add("DuckDB transition written", d.transition_written_detail); add("DuckDB transition read back", d.transition_read_back_detail);
     for (const du of task.durations) add(`Duration, ${du.label}`, du.scope_note);
     add("Task", task.title);
-    for (const c of cx.corrections) notes.push(`Correction ${c.field}: displayed ${c.displayed_value}; producer record ${c.producer_value}, superseded. Source: ${c.source} ${c.note}`);
+    for (const c of cx.corrections) notes.push(`${c.field}: ${c.displayed_value} \u2014 ${c.basis_label || "corrected"}; producer record: ${c.producer_value}. Source: ${c.source} ${c.note}`);
   }
   for (const e of sn.engine_caches) if (e.hit.note) notes.push(`Engine KV ${e.label}: ${e.hit.note}`);
   for (const n of sn.network) notes.push(`${n.label}: ${n.latency.note || "no note"}`);
@@ -59,6 +59,22 @@ export function evidencePanel(ev: EvidenceState, sn: Snapshot, task: Task | null
   body.appendChild(recs);
   const svcs = h("section", { class: "ev-sec", "data-sec": "services" }, h("h3", {}, "Services, now"), servicesList({ sn, hist: null, task, details: () => undefined }));
   body.appendChild(svcs);
+  const srcs = h("section", { class: "ev-sec", "data-sec": "sources" }, h("h3", {}, "Sources and collector versions"),
+    h("p", { class: "ev-warn" }, "Collectors are external checkouts. Pitwall's clean Git status does not pin them, so these readings are not reproducible from a Pitwall commit alone."));
+  for (const so of sn.sources) {
+    const v = so.version;
+    const access = so.path === "self_refresh" ? "invoked the collector (--dump-json)" : so.path === "tui_cache" ? "read its cached snapshot; writer not identified" : so.path === "fixture" ? "committed fixture" : "read run-directory receipts";
+    const version = !v ? null : v.commit ? `commit ${v.commit}, ${v.dirty === null ? "dirty state unknown" : v.dirty ? `dirty, ${v.changed_files.length} changed` : "clean"}` : "commit unknown";
+    srcs.appendChild(h("div", { class: "ev-hop" },
+      h("div", { class: "ev-hop-h" }, h("b", {}, so.label), badge(fromActivity(so.state), so.state)),
+      h("div", { class: "ev-line" }, `Access: ${access}`),
+      so.last_error ? h("div", { class: "ev-line ev-err" }, `Last error: ${so.last_error}`) : null,
+      version ? h("div", { class: "ev-line" }, `Version: ${version}`) : null,
+      v ? h("div", { class: "ev-line dim" }, `${v.repo}${v.checked_at ? `, checked ${v.checked_at}` : ""}`) : null,
+      v?.changed_files.length ? h("div", { class: "ev-line dim" }, v.changed_files.join(", ")) : null,
+      v?.note ? h("div", { class: "ev-line dim" }, v.note) : null));
+  }
+  body.appendChild(srcs);
   const cov = h("section", { class: "ev-sec", "data-sec": "coverage" }, h("h3", {}, "Coverage notes"));
   if (sn.coverage_notes.length === 0) cov.appendChild(h("p", { class: "empty-note" }, "None reported."));
   else { const l = h("ul", { class: "plain" }); for (const n of sn.coverage_notes) l.appendChild(h("li", {}, n)); cov.appendChild(l); }

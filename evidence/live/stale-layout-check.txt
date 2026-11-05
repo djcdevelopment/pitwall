@@ -1,0 +1,4 @@
+before: fleet idle age 4.3, page 900
+after: fleet unreachable age 22.4, page 900
+boxes compared 31, moved 0
+clipped CH-4 cells: none

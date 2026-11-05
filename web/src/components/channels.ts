@@ -93,7 +93,7 @@ export function ch5(c: Ctx): HTMLElement {
     line("Pack cache", "job", cacheVal(t?.caches.pack_cache ?? null), t?.caches.pack_cache, "green"),
     packTimings(t?.caches.pack_cache),
     line("AST/RAM", "job", cacheVal(t?.caches.ast_ram ?? null), t?.caches.ast_ram, "green"),
-    line("Model KV", "job", cacheVal(t?.caches.model_kv ?? null), t?.caches.model_kv, "cyan"),
+    line("Cached input", "job", cacheVal(t?.caches.model_kv ?? null), t?.caches.model_kv, "cyan"),
     h("div", { class: "cl cl-h" }, h("span", { class: "k" }, "Engine/daemon uptime, not per job")),
   ];
   if (c.sn.engine_caches.length === 0) left.push(line("no engine counters", null, reading(null)));
@@ -104,9 +104,11 @@ export function ch5(c: Ctx): HTMLElement {
     right.push(line("HEARTH input bytes", null, bytesEl(cx.hearth_input)), line("Selected pack bytes", null, bytesEl(cx.selected_pack)));
     const fact = (label: string, m: Measurement, field: string) => {
       const corr = cx.corrections.find((x) => x.field === field);
-      const txt = corr ? `${corr.displayed_value} (reviewed)` : m.numerator !== null && m.denominator !== null ? `${m.numerator}/${m.denominator}` : "unknown";
+      const txt = corr ? corr.displayed_value : m.numerator !== null && m.denominator !== null ? `${m.numerator}/${m.denominator}` : "unknown";
       const out: Node[] = [line(label, null, h("span", { class: m.numerator === null && !corr ? "rd rd-unknown" : "rd rd-ok" }, txt))];
-      if (corr) out.push(h("div", { class: "cl corr", title: corr.source }, h("span", { class: "amb" }, `producer ${corr.producer_value}, superseded`)));
+      if (corr) out.push(
+        h("div", { class: "cl corr", title: corr.source }, h("span", { class: "amb" }, `${corr.displayed_value} \u2014 ${corr.basis_label || "corrected"}`)),
+        h("div", { class: "cl corr" }, h("span", { class: "dim" }, `producer record: ${corr.producer_value}`)));
       return out;
     };
     right.push(...fact("Facts selected", cx.required_facts_selected, "required_facts_selected"), ...fact("Facts baseline", cx.required_facts_baseline, "required_facts_baseline"));

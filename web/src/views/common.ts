@@ -71,8 +71,12 @@ export function freshness(sn: Snapshot | null, collectorsOnly = false): HTMLElem
     if (so.observed_at) age = h("span", { class: "age", "data-since": String(Date.parse(so.observed_at)) }, fmtAge(ageSince(so.observed_at) ?? 0));
     else if (so.read_at) age = h("span", { class: "age", "data-since": String(Date.parse(so.read_at)) }, fmtAge(ageSince(so.read_at) ?? 0));
     else age = h("span", { class: "dim" }, "not read yet");
+    const v = so.version;
+    const vText = !v ? null : !v.commit ? "no commit" : `${v.commit.slice(0, 7)}${v.dirty === false ? "" : v.dirty ? " dirty" : " ?"}`;
+    const unpinned = !!v && (!v.commit || v.dirty !== false);
     w.appendChild(h("span", { class: "src", title: `${so.path}${so.last_error ? " | " + so.last_error : ""}` },
-      badge(fromActivity(so.state), so.label, "compact"), " ", age));
+      badge(fromActivity(so.state), so.label, "compact"), " ", age,
+      vText ? h("button", { type: "button", class: `vchip${unpinned ? " vchip-warn" : ""}`, "data-fid": `ver-${so.id}`, "aria-label": `${so.label} version ${vText}, open source details`, onclick: () => store.openEvidence(selectedTask()?.id ?? null, null, `ver-${so.id}`, "sources") }, vText) : null));
   }
   return w;
 }
