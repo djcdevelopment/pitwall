@@ -425,3 +425,5 @@ html[data-view="desktop"] body { padding: 6px 10px; font-size: 12px; line-height
 .view-desktop .bottom { height: 216px; } .view-desktop .bottom > * { height: auto; min-height: 0; overflow: auto; }
 .foot { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .view-narrow .foot { white-space: normal; }
+/* Each seat row carries its own stale badge; repeating the age in tight columns collides. */
+.view-desktop .seat-r .rd-stale, .view-desktop .seat-q .rd-stale { display: none; }
