@@ -25,7 +25,8 @@ SCHEMA = "pitwall.v1"
 MeasurementStatus = Literal["ok", "stale", "unreachable", "unknown", "unused"]
 Scope = Literal["host", "device", "job", "engine_lifetime", "daemon_lifetime"]
 # Current state of a service, device, seat, collector or the system as a whole.
-ActivityState = Literal["active", "idle", "stale", "unreachable", "unknown"]
+# reachable: an endpoint answered; says nothing about whether work is happening there.
+ActivityState = Literal["active", "idle", "reachable", "stale", "unreachable", "unknown"]
 ParticipationState = Literal["active", "used", "unused", "unknown"]
 OutcomeState = Literal["active", "staged", "completed", "recovered", "failed", "unknown"]
 StageState = Literal["done", "working", "waiting", "attention", "failed", "unknown", "unused"]
@@ -120,6 +121,7 @@ class InspectionLink(BaseModel):
     service_id: str = ""
     enabled: bool = True
     reason: str = ""  # shown when disabled
+    annotation: str = ""  # shown when enabled but its backend has a problem
 
 
 class Service(BaseModel):
@@ -132,6 +134,7 @@ class Service(BaseModel):
     source: str
     age_s: Optional[float] = None
     link: Optional[InspectionLink] = None
+    backlog: Optional[Measurement] = None  # null value is unknown, never zero
 
 
 class Exception_(BaseModel):

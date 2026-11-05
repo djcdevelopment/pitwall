@@ -25,7 +25,9 @@ from .sources import CacheSource, SourceState
 from .sources import fleet as fleet_src
 from .sources import flow as flow_src
 from .sources.receipts import ReceiptReader
+from .sources.endpoints import load_identity, observe
 from .sources.version import read_version
+from .endpoint_services import build as build_endpoint_services
 from .util import iso_from_epoch, now_iso
 
 _VOLATILE = {"generated_at", "read_at", "age_s"}
@@ -66,12 +68,14 @@ class Store:
         self._flow_seen = -1
         self._stop = threading.Event()
         self._versions: dict[str, tuple[float, object]] = {}
+        self.identity = load_identity(cfg.endpoints_path)
+        self._endpoints: Optional[dict] = None
         self._threads: list[threading.Thread] = []
 
     # -- lifecycle -----------------------------------------------------------------------------
     def start(self) -> None:
         self.rebuild()
-        for name, fn in (("pitwall-fleet", lambda: self._loop(self.fleet)), ("pitwall-flow", lambda: self._loop(self.flow)), ("pitwall-tick", self._tick)):
+        for name, fn in (("pitwall-fleet", lambda: self._loop(self.fleet)), ("pitwall-flow", lambda: self._loop(self.flow)), ("pitwall-tick", self._tick), ("pitwall-endpoints", self._endpoint_loop)):
             t = threading.Thread(target=fn, name=name, daemon=True)
             t.start()
             self._threads.append(t)
@@ -87,6 +91,15 @@ class Store:
             except Exception:  # noqa: BLE001 - a collector failure must not end the thread
                 pass
             self._stop.wait(self.cfg.poll_s)
+
+    def _endpoint_loop(self) -> None:
+        """Own thread: a slow or wedged probe delays only these rows."""
+        while not self._stop.is_set():
+            try:
+                self._endpoints = observe(self.identity, time.time())
+            except Exception:  # noqa: BLE001 - a probe failure must not end the thread
+                pass
+            self._stop.wait(self.cfg.endpoints_poll_s)
 
     def _tick(self) -> None:
         while not self._stop.is_set():
@@ -124,8 +137,15 @@ class Store:
             ctx = Ctx(mode="live", scenario=None, read_at=iso_from_epoch(now) or "", corrections=self.corrections,
                       evidence_tasks={tid for tid, recs in names.items() if recs},
                       history_started_at=iso_from_epoch(self.history.started_at))
+            ep = self._endpoints
+            ep_epoch = ep["observed_epoch"] if ep else None
+            ep_age = round(now - ep_epoch, 1) if ep_epoch else None
+            ep_rows, ep_links = build_endpoint_services(self.identity, ep, iso_from_epoch(now) or "", iso_from_epoch(ep_epoch), ep_age)
+            ep_rec = SourceRecord(id="endpoints", label="Endpoint probes", state="idle" if ep and ep_age is not None and ep_age <= 60 else "stale" if ep else "unknown",
+                                  path="direct_probes", observed_at=iso_from_epoch(ep_epoch), read_at=iso_from_epoch(now), age_s=ep_age, stale_after_s=60.0)
             snap = build_snapshot(ctx=ctx, generated_at=now_iso(), fleet=fl.data, flow=fw.data, fleet_rec=fleet_rec, flow_rec=flow_rec,
-                                  receipts_rec=receipts_rec, views=views)
+                                  receipts_rec=receipts_rec, views=views, endpoint_rows=ep_rows if self.identity else None,
+                                  endpoint_links=ep_links, endpoints_rec=ep_rec if self.identity else None)
             # history: one sample per new fleet observation; gaps only when stale
             self.history.record_fleet(snap, fl.observed_epoch, advanced=fl.obs_count != self._fleet_seen,
                                       stale=fleet_rec.state in ("stale", "unreachable") and (fl.age_s(now) is None or fl.age_s(now) > fl.stale_after_s), now=now)

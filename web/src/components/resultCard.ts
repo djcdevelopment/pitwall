@@ -7,7 +7,8 @@ import { segbar } from "./segbar";
 
 export function linkEl(l: InspectionLink): HTMLElement {
   const href = safeHref(l.url);
-  if (l.enabled && href) return h("a", { class: "ilink", href, target: "_blank", rel: "noopener noreferrer" }, l.label, " ↗");
+  if (l.enabled && href) return h("span", { class: "ilink-w" }, h("a", { class: "ilink", href, target: "_blank", rel: "noopener noreferrer" }, l.label, " ↗"),
+    l.annotation ? h("span", { class: "ilink-note" }, ` ${l.annotation}`) : null);
   return h("span", { class: "ilink ilink-off", "aria-disabled": "true" }, l.label, " (disabled: ", l.reason || (href ? "service not reachable now" : "link not loopback"), ")");
 }
 

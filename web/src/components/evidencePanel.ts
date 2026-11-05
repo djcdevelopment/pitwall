@@ -63,7 +63,7 @@ export function evidencePanel(ev: EvidenceState, sn: Snapshot, task: Task | null
     h("p", { class: "ev-warn" }, "Collectors are external checkouts. Pitwall's clean Git status does not pin them, so these readings are not reproducible from a Pitwall commit alone."));
   for (const so of sn.sources) {
     const v = so.version;
-    const access = so.path === "self_refresh" ? "invoked the collector (--dump-json)" : so.path === "tui_cache" ? "read its cached snapshot; writer not identified" : so.path === "fixture" ? "committed fixture" : "read run-directory receipts";
+    const access = so.path === "self_refresh" ? "invoked the collector (--dump-json)" : so.path === "tui_cache" ? "read its cached snapshot; writer not identified" : so.path === "fixture" ? "committed fixture" : so.path === "direct_probes" ? "Pitwall's own probes: TCP connect, HTTP GET and docker inspect of container state" : "read run-directory receipts";
     const version = !v ? null : v.commit ? `commit ${v.commit}, ${v.dirty === null ? "dirty state unknown" : v.dirty ? `dirty, ${v.changed_files.length} changed` : "clean"}` : "commit unknown";
     srcs.appendChild(h("div", { class: "ev-hop" },
       h("div", { class: "ev-hop-h" }, h("b", {}, so.label), badge(fromActivity(so.state), so.state)),

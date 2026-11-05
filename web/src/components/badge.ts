@@ -1,10 +1,10 @@
 import { h } from "../dom";
 import type { ActivityState, CheckState, DeliveryState, OutcomeState, ParticipationState, ReviewState, StageState, StepState } from "../contract";
 
-export type Kind = "active" | "idle" | "stale" | "unreachable" | "unknown" | "unused" | "completed" | "recovered" | "failed" | "attention";
+export type Kind = "active" | "idle" | "reachable" | "stale" | "unreachable" | "unknown" | "unused" | "completed" | "recovered" | "failed" | "attention";
 
 export const GLYPH: Record<Kind, string> = {
-  active: "▶", idle: "■", stale: "◷", unreachable: "✗", unknown: "?",
+  active: "▶", idle: "■", reachable: "●", stale: "◷", unreachable: "✗", unknown: "?",
   unused: "·", completed: "✓", recovered: "↺", failed: "✗", attention: "!",
 };
 

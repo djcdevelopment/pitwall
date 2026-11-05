@@ -1,0 +1,12 @@
+2026-11-05T06:52:16Z
+tcp 5672 refused
+tcp 5673 open
+tcp 4317 refused
+tcp 4318 refused
+tcp 18888 refused
+GET :18080/ 200
+GET :18080/api/queues/ 500 5.238547s
+bh2-servicebus-explorer: Up 3 hours
+washplant-sb-emulator: Up 2 hours
+lap1-aspire-dashboard: Exited (255) 3 hours ago
+workflowkit-servicebus-emulator: Exited (255) 3 hours ago

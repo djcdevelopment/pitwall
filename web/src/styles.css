@@ -392,7 +392,7 @@ html[data-view="desktop"] body { padding: 6px 10px; font-size: 12px; line-height
 .view-narrow .seat { grid-template-columns: minmax(0, 1fr) auto auto; }
 .view-narrow .rt-i { flex-direction: row; }
 
-.view-desktop #ch6 .cols2 { grid-template-columns: 244px minmax(0, 1fr); }
+.view-desktop #ch6 .cols2 { grid-template-columns: 214px minmax(0, 1fr); }
 .cl-h .k { letter-spacing: 0; font-size: 9.5px; } .cl-h .scope-tag { white-space: nowrap; }
 .svc2 li .badge { font-size: 10px; }
 .result, .recent { height: 228px; }
@@ -438,4 +438,12 @@ html[data-view="desktop"] body { padding: 6px 10px; font-size: 12px; line-height
 .vchip { background: none; border: 1px solid var(--p700); border-radius: 3px; color: var(--txt2); font: inherit; font-size: 10.5px; padding: 0 4px; margin-left: 4px; cursor: pointer; white-space: nowrap; }
 .vchip-warn { color: var(--amber); border-color: rgba(255,170,0,.5); }
 .view-narrow .vchip { min-height: 44px; min-width: 44px; font-size: 13px; }
-.view-desktop .bottom { height: 208px; }
+.view-desktop .bottom { height: 205px; }
+.b-reachable { color: var(--txt); }
+.ilink-note { color: var(--amber); font-size: 11px; overflow-wrap: anywhere; }
+/* CH-6 now lists each broker and receiver separately; keep the card within its row. */
+.view-desktop #ch6 .svc2 { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.view-desktop #ch6 .svc2 li { min-height: 14px; line-height: 14px; font-size: 10.5px; }
+.view-desktop #ch6 .svc2 .badge { line-height: 13px; font-size: 10px; border-width: 0; padding: 0; white-space: nowrap; }
+.view-desktop #ch6 .svcwrap .cl-h { min-height: 16px; }
+.view-desktop #ch6 .svcwrap .mini-btn { min-height: 16px; line-height: 14px; }

@@ -1,0 +1,47 @@
+{
+  "brokers": [
+    {
+      "id": "bh2_broker",
+      "name": "BH2 broker :5672",
+      "responsibility": "BH2 help-run transport, on the shared workflow-kit emulator",
+      "container": "workflowkit-servicebus-emulator",
+      "host": "127.0.0.1",
+      "port": 5672,
+      "network_endpoint": "workflowkit-servicebus-emulator:5672, admin :5300",
+      "config_path": "~/work/workflow-kit/infra/servicebus/config.json",
+      "runtime_entities": ["bh2-orland-help-20261104"],
+      "runtime_note": "BH2's queue is created at runtime and is not in the emulator's startup config, so an emulator restart does not restore it (handoff OPERATIONS.md:101).",
+      "identity_basis": "bh2-broker-help.py:31-36 uses Explorer's connection string with the host swapped to 127.0.0.1, which is port 5672; workflow-kit docker-compose.yml:26 publishes 5672."
+    },
+    {
+      "id": "washplant_broker",
+      "name": "Washplant broker :5673",
+      "responsibility": "Washplant work transport, on its own emulator",
+      "container": "washplant-sb-emulator",
+      "host": "127.0.0.1",
+      "port": 5673,
+      "network_endpoint": "washplant-sb-emulator:5672, admin :5300",
+      "config_path": "~/work/washplant/infra/servicebus/config.json",
+      "runtime_entities": [],
+      "runtime_note": "",
+      "identity_basis": "washplant/DECISIONS.md:5 and docker-compose.yml:1 declare its own emulator, so restart tests cannot touch the shared one. It is not a replacement for BH2's broker."
+    }
+  ],
+  "explorer": {
+    "container": "bh2-servicebus-explorer",
+    "ui_url": "http://127.0.0.1:18080/",
+    "queues_url": "http://127.0.0.1:18080/api/queues/",
+    "attached_broker": "bh2_broker",
+    "identity_basis": "bh2-servicebus-explorer runs on network workflowkit-servicebus_sb-emulator with sb://workflowkit-servicebus-emulator; it cannot see Washplant's broker."
+  },
+  "aspire": {
+    "container": "lap1-aspire-dashboard",
+    "ui_host": "127.0.0.1",
+    "ui_port": 18888,
+    "ui_url": "http://127.0.0.1:18888",
+    "otlp": [
+      { "label": "gRPC", "port": 4317 },
+      { "label": "HTTP", "port": 4318 }
+    ]
+  }
+}

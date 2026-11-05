@@ -4,7 +4,7 @@
 
 export type MeasurementStatus = "ok" | "stale" | "unreachable" | "unknown" | "unused";
 export type Scope = "host" | "device" | "job" | "engine_lifetime" | "daemon_lifetime";
-export type ActivityState = "active" | "idle" | "stale" | "unreachable" | "unknown";
+export type ActivityState = "active" | "idle" | "reachable" | "stale" | "unreachable" | "unknown";
 export type ParticipationState = "active" | "used" | "unused" | "unknown";
 export type OutcomeState = "active" | "staged" | "completed" | "recovered" | "failed" | "unknown";
 export type StageState = "done" | "working" | "waiting" | "attention" | "failed" | "unknown" | "unused";
@@ -96,6 +96,7 @@ export interface InspectionLink {
   service_id: string;
   enabled: boolean;
   reason: string;
+  annotation: string;
 }
 
 export interface Service {
@@ -108,6 +109,7 @@ export interface Service {
   source: string;
   age_s: number | null;
   link: InspectionLink | null;
+  backlog: Measurement | null;
 }
 
 export interface SystemException {

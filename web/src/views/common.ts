@@ -66,7 +66,7 @@ export function freshness(sn: Snapshot | null, collectorsOnly = false): HTMLElem
   if (!sn) return w;
   if (state.mode === "demo") { w.appendChild(h("span", { class: "src dim" }, "fixture data, no live sources")); return w; }
   for (const so of sn.sources) {
-    if (collectorsOnly && so.id === "receipts") continue;
+    if (collectorsOnly && (so.id === "receipts" || so.id === "endpoints")) continue;
     let age: HTMLElement;
     if (so.observed_at) age = h("span", { class: "age", "data-since": String(Date.parse(so.observed_at)) }, fmtAge(ageSince(so.observed_at) ?? 0));
     else if (so.read_at) age = h("span", { class: "age", "data-since": String(Date.parse(so.read_at)) }, fmtAge(ageSince(so.read_at) ?? 0));

@@ -132,6 +132,7 @@ export function servicesList(c: Ctx): HTMLElement {
       h("div", { class: "svc-h" }, h("b", {}, s.name), badge(fromActivity(s.state), `now: ${s.state}`)),
       h("div", { class: "dim" }, `${s.responsibility}${s.endpoint ? ` | ${s.endpoint}` : ""}`),
       h("div", { class: "dim" }, s.detail, a !== null ? ` (${fmtAge(a)} ago, ${s.source})` : ""),
+      s.backlog ? h("div", {}, h("span", { class: "k" }, "Backlog: "), reading(s.backlog)) : null,
       s.link ? linkEl(s.link) : null));
   }
   if (c.sn.services.length === 0) list.appendChild(h("li", { class: "empty-note" }, "No services reported."));
@@ -147,6 +148,9 @@ export function ch6(c: Ctx, withServices: boolean): HTMLElement {
     left.push(h("div", { class: "cl cl-h" }, h("span", { class: "k" }, "DuckDB steps")),
       st("Source snapshot read", d.source_snapshot_read, d.source_snapshot_detail), st("Transition written", d.transition_written, d.transition_written_detail), st("Transition read back", d.transition_read_back, d.transition_read_back_detail));
   } else left.push(h("div", { class: "empty-note" }, "No task selected."));
+  const queueSvc = c.sn.services.find((s) => s.backlog);
+  if (queueSvc?.backlog) left.push(h("div", { class: "cl cl-h" }, h("span", { class: "k" }, "Brokers")),
+    h("div", { class: "cl", title: queueSvc.backlog.note }, h("span", { class: "k" }, "BH2 queue backlog"), h("span", { class: "grow" }), reading(queueSvc.backlog)));
   left.push(h("div", { class: "cl cl-h" }, h("span", { class: "k" }, "Network")));
   if (c.sn.network.length === 0) left.push(h("div", { class: "cl" }, h("span", { class: "k" }, "OMEN-AM4 Network latency"), h("span", { class: "grow" }), reading(null)));
   for (const l of c.sn.network) left.push(h("div", { class: "cl nl", title: l.latency.note || undefined }, h("span", { class: "k" }, l.label), h("span", { class: "grow" }), reading(l.latency)),

@@ -47,6 +47,7 @@ class Ctx:
     evidence_tasks: set[str] = field(default_factory=set)
     scenario_note: str = ""
     history_started_at: Optional[str] = None
+    link_notes: dict[str, str] = field(default_factory=dict)
 
     def src(self, live: str) -> str:
         return f"demo:{self.scenario}" if self.mode == "demo" else live
@@ -231,13 +232,18 @@ def norm_fleet(fleet: Optional[dict], fleet_state: str, ctx: Ctx) -> dict:
 # ---- flow services -------------------------------------------------------------------------------
 
 
-def norm_services(flow: Optional[dict], flow_state: str, ctx: Ctx) -> list[Service]:
+def norm_services(flow: Optional[dict], flow_state: str, ctx: Ctx, endpoint_rows: Optional[list[Service]] = None) -> list[Service]:
     rows = {s.get("service_id"): s for s in (flow or {}).get("services", []) if isinstance(s, dict)}
     order = [s.get("service_id") for s in (flow or {}).get("services", []) if isinstance(s, dict)] or \
         ["service_bus", "ontology", "hearth", "lifetime_caches", "duckdb", "aspire"]
-    out: list[Service] = []
+    out: list[Service] = list(endpoint_rows or [])
     for sid in order:
         s = rows.get(sid, {})
+        if endpoint_rows is not None and sid == "service_bus":
+            continue  # flow-top combines Explorer and :5672; Pitwall reports each instance itself
+        if endpoint_rows is not None and sid == "aspire":
+            out.append(_irc_row(ctx))
+            continue
         raw = str(s.get("state", "unknown"))
         state = {"idle": "idle", "active": "active", "unavailable": "unreachable", "stale": "stale"}.get(raw, "unknown")
         if flow is None:
@@ -255,12 +261,16 @@ def norm_services(flow: Optional[dict], flow_state: str, ctx: Ctx) -> list[Servi
             detail=str(s.get("detail", "")), source=ctx.src(str(s.get("source", "flow-top"))), age_s=to_float(s.get("obs_age_s")), link=link,
         ))
         if sid == "aspire":
-            out.append(Service(
-                id="irc", name="IRC (passive receipts)", responsibility=RESPONSIBILITY["irc"], endpoint="IRC-RECEIPTS.jsonl in run directories",
-                state="unknown", detail="Not probed: flow-top follows a zero-socket rule for IRC. Per-task delivery is read from receipts.",
-                source=ctx.src("flow-top aspire row (zero IRC socket connects)"), age_s=None, link=None,
-            ))
+            out.append(_irc_row(ctx))
     return out
+
+
+def _irc_row(ctx: Ctx) -> Service:
+    return Service(
+        id="irc", name="IRC (passive receipts)", responsibility=RESPONSIBILITY["irc"], endpoint="IRC-RECEIPTS.jsonl in run directories",
+        state="unknown", detail="Not probed: flow-top follows a zero-socket rule for IRC. Per-task delivery is read from receipts.",
+        source=ctx.src("flow-top aspire row (zero IRC socket connects)"), age_s=None, link=None,
+    )
 
 
 # ---- tasks ----------------------------------------------------------------------------------------
@@ -355,7 +365,8 @@ def build_task(ft: dict, view: P.ReceiptView, services: dict[str, str], ctx: Ctx
             return
         st = services.get(service_id, "unknown")
         links.append(InspectionLink(label=label, url=u, service_id=service_id, enabled=st != "unreachable",
-                                    reason=f"{service_id.replace('_', ' ')} unreachable at last probe" if st == "unreachable" else ""))
+                                    reason=f"{service_id.replace('_', ' ')} unreachable at last probe" if st == "unreachable" else "",
+                                    annotation=ctx.link_notes.get(service_id, "")))
 
     link("Aspire trace", ft.get("aspire_trace_url"), "aspire")
     link("Service Bus Explorer", ft.get("broker_explorer_url"), "service_bus")
@@ -382,11 +393,17 @@ def build_task(ft: dict, view: P.ReceiptView, services: dict[str, str], ctx: Ctx
 
 
 def build_snapshot(*, ctx: Ctx, generated_at: str, fleet: Optional[dict], flow: Optional[dict], fleet_rec: SourceRecord,
-                   flow_rec: SourceRecord, receipts_rec: SourceRecord, views: dict[str, P.ReceiptView]) -> Snapshot:
+                   flow_rec: SourceRecord, receipts_rec: SourceRecord, views: dict[str, P.ReceiptView],
+                   endpoint_rows: Optional[list[Service]] = None, endpoint_links: Optional[dict] = None,
+                   endpoints_rec: Optional[SourceRecord] = None) -> Snapshot:
     fl = norm_fleet(fleet, fleet_rec.state, ctx)
-    services = norm_services(flow, flow_rec.state, ctx)
+    services = norm_services(flow, flow_rec.state, ctx, endpoint_rows)
     svc_state = {s.id: s.state for s in services}
     svc_state["preview"] = "unknown"
+    for key, (state, note) in (endpoint_links or {}).items():
+        svc_state[key] = state
+        if note:
+            ctx.link_notes[key] = note
     tasks: list[Task] = []
     flow_tasks = [t for t in (flow or {}).get("tasks", []) if isinstance(t, dict)][:10]
     for ft in flow_tasks:
@@ -408,9 +425,11 @@ def build_snapshot(*, ctx: Ctx, generated_at: str, fleet: Optional[dict], flow: 
         r = next(r for r in recs if r.state == "stale")
         exc = Exception_(level="stale", text=f"{r.label} collector stale (last observation older than {r.stale_after_s:.0f}s)", source=ctx.src(r.label))
     else:
-        s = next((s for s in services if s.state == "unreachable"), None)
-        if s:
-            exc = Exception_(level="service", text=f"{s.name} unreachable: {s.detail}", source=ctx.src("flow-top"))
+        down = [s for s in services if s.state == "unreachable"]
+        if down:
+            s, more = down[0], f"; {len(down) - 1} more below" if len(down) > 1 else ""
+            first = s.detail.split(". ")[0].rstrip(".")
+            exc = Exception_(level="service", text=f"{s.name} unreachable: {first}{more}", source=ctx.src(s.source or "flow-top"))
 
     act_slots, cap_slots = fl["slots"]
     any_task = any(t.outcome.state == "active" for t in tasks)
@@ -430,8 +449,10 @@ def build_snapshot(*, ctx: Ctx, generated_at: str, fleet: Optional[dict], flow: 
     if flow:
         if isinstance(flow.get("duckdb"), dict) and flow["duckdb"].get("updates_deletions_status"):
             notes.append("DuckDB row updates and deletions: " + str(flow["duckdb"]["updates_deletions_status"]))
-        if flow.get("headline_available"):
+        if flow.get("headline_available") and endpoint_rows is None:
             notes.append(str(flow["headline_available"]))
+    if endpoint_rows is not None:
+        notes.append("Broker, Explorer and Aspire rows are Pitwall's own observations. flow-top combines Explorer and :5672 into one row and reports backlog 0 when discovery fails, so that row is not used.")
     notes.append("flow-top does not probe IRC (zero-socket rule); IRC state is read per task from receipts.")
     notes.append("Task path states are derived from run-directory receipts; flow-top's not_used_by_job labels are not used.")
 
@@ -440,7 +461,7 @@ def build_snapshot(*, ctx: Ctx, generated_at: str, fleet: Optional[dict], flow: 
         note="unmeasured: fleet-top lists this as a known blind spot"))]
     return Snapshot(
         schema=SCHEMA, seq=0, mode=ctx.mode, scenario=ctx.scenario, scenario_note=ctx.scenario_note,  # type: ignore[call-arg]
-        generated_at=generated_at, overall=overall, exception=exc, sources=[fleet_rec, flow_rec, receipts_rec], hosts=fl["hosts"],
+        generated_at=generated_at, overall=overall, exception=exc, sources=[fleet_rec, flow_rec, receipts_rec] + ([endpoints_rec] if endpoints_rec else []), hosts=fl["hosts"],
         devices=fl["devices"], seats=fl["seats"], services=services, engine_caches=fl["engine_caches"], network=network, tasks=tasks,
         default_task_id=default, coverage_notes=notes, history_started_at=ctx.history_started_at,
     )
