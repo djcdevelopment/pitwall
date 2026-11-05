@@ -55,7 +55,9 @@ def build(identity: dict, obs: Optional[dict], read_at: str, observed_at: Option
         if not_probed:
             detail = "Not probed yet."
         elif ok:
-            detail = f"AMQP port {port} accepts TCP; {_container(o.get('container'))}. {named} Live queues and backlog not observed: no read-only discovery path reaches this broker."
+            detail = f"AMQP port {port} accepts TCP; {_container(o.get('container'))}. {named} " + (
+                "Live queues and backlog: see Explorer broker API." if b["id"] == (identity.get("explorer") or {}).get("attached_broker")
+                else "Live queues and backlog not observed: no read-only discovery path reaches this broker.")
         else:
             detail = f"Configured endpoint {port} {o.get('tcp', 'not probed')}; {_container(o.get('container'))}. {named}"
         if b.get("runtime_note"):

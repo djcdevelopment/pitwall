@@ -73,3 +73,12 @@ def test_explorer_link_stays_enabled_with_backend_annotation():
 def test_aspire_ui_and_receiver_are_separate_rows():
     r, _ = _rows({"status": 500, "seconds": 5.4})
     assert r["aspire_ui"].state == "unreachable" and r["aspire_otlp"].state == "unreachable" and r["aspire_ui"].link.enabled is False
+
+
+def test_only_the_broker_explorer_reaches_points_to_discovery():
+    obs = _obs({"status": 200, "seconds": 0.1, "json": [{"activeMessageCount": 0}]})
+    obs["brokers"]["bh2_broker"]["tcp"] = "open"
+    rows, _ = build_rows(IDENTITY, obs, "now", "now", 1.0)
+    r = {x.id: x for x in rows}
+    assert "see Explorer broker API" in r["bh2_broker"].detail
+    assert "not observed" in r["washplant_broker"].detail
