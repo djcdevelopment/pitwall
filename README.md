@@ -45,6 +45,15 @@ run-directory receipts (mtime-aware) ---^                                       
 - `web/`: TypeScript, Vite, Tailwind v3 compiled at build time, inline SVG instruments, and bundled OFL fonts (`JetBrains Mono`, `Share Tech Mono`). Zero runtime CDN requests.
 - `reference/stitch-export/`: Design reference export. `DESIGN.md` there is visual style reference only, not runtime evidence.
 
+### Architecture, UML & Data Flow Diagrams
+
+Detailed visual blueprints for Pitwall's hardware/service topology, contracts, polling loops, and per-section data provenance live in [`docs/architecture/README.md`](docs/architecture/README.md):
+
+1. **[Dashboard Section-by-Section Source-of-Truth Blueprint](docs/architecture/pitwall-section-truth-map.png)** — Maps every UI widget and 9-hop path node on `127.0.0.1:18110` to its upstream file, `/dev/shm` cache, endpoint probe, and live vs. receipt-frozen update state.
+2. **[System, Repository & Hardware Topology Architecture](docs/architecture/pitwall-system-architecture.png)** — Four-tier architecture across compute hosts (`omen`, `am4`, `fx99`), broker/telemetry containers, collector repos (`fleet-top`, `flow-top`), FastAPI (`:18110`), and SPA views.
+3. **[UML Data Contracts, Component Hierarchy & Runtime Sequence](docs/architecture/pitwall-uml-contracts.png)** — Schema mapping across `fleet_monitor_snapshot.v2` → `flow_top_snapshot.v1` → `pitwall.v1` (`contract.py` ⇄ `contract.ts`) and the non-blocking dual polling sequence.
+4. **[Data Flow Diagram (DFD Level 0 + Level 1 & Breakpoints)](docs/architecture/pitwall-dfd.png)** — Traces processes `P1`–`P7`, data stores `D1`–`D6`, and the 5 explicit data-flow breakpoints separating live hardware telemetry from historical run-directory receipts.
+
 ## Configuration & Sources
 
 | Variable | Default | Meaning |
