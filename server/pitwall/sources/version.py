@@ -6,7 +6,7 @@ from __future__ import annotations
 import subprocess
 
 from ..contract import CollectorVersion
-from ..util import iso_from_epoch
+from ..util import iso_from_epoch, scrub_identifiers
 
 
 def _git(repo: str, *args: str) -> subprocess.CompletedProcess:
@@ -15,7 +15,7 @@ def _git(repo: str, *args: str) -> subprocess.CompletedProcess:
 
 
 def read_version(repo: str, now: float) -> CollectorVersion:
-    base = {"repo": repo, "checked_at": iso_from_epoch(now) or ""}
+    base = {"repo": scrub_identifiers(repo), "checked_at": iso_from_epoch(now) or ""}
     try:
         head = _git(repo, "rev-parse", "HEAD")
         if head.returncode != 0:
@@ -24,7 +24,7 @@ def read_version(repo: str, now: float) -> CollectorVersion:
         if status.returncode != 0:
             return CollectorVersion(**base, commit=head.stdout.strip(), note="git status failed: dirty state unknown.")
     except (OSError, subprocess.SubprocessError) as exc:
-        return CollectorVersion(**base, note=f"git unavailable: {exc}")
+        return CollectorVersion(**base, note=scrub_identifiers(f"git unavailable: {exc}"))
     changed = [line[3:] for line in status.stdout.splitlines() if line[3:]]
     return CollectorVersion(**base, commit=head.stdout.strip(), dirty=bool(changed), changed_files=changed[:40],
                             note="Checkout state now. A cached snapshot may come from a process that loaded earlier code.")

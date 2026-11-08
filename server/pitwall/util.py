@@ -64,6 +64,31 @@ def loopback_url(url: Any) -> Optional[str]:
 
 
 _FRACTION = re.compile(r"^\s*(\d+)\s*/\s*(\d+)\s*$")
+_HOME_PATH = re.compile(r"/home/[A-Za-z0-9._-]+")
+_HOME_SLUG = re.compile(r"-home-[A-Za-z0-9._-]+-")
+_TS_NET = re.compile(r"\b([A-Za-z0-9_-]+)\.[A-Za-z0-9_-]+\.ts\.net\b")
+_PRIV_IP = r"(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})"
+_PAREN_HOST_IPS = re.compile(rf"\s*\((?:{_PRIV_IP}|[A-Za-z0-9_-]+)(?:\s*/\s*{_PRIV_IP})+\)|\s*\({_PRIV_IP}\)")
+_PRIV_IP_PORT = re.compile(rf"\b{_PRIV_IP}:(\d+)\b")
+_PRIV_IP_BARE = re.compile(rf"\b{_PRIV_IP}\b")
+
+
+def scrub_identifiers(text: str) -> str:
+    """Strip local user paths, tailnet domains and private LAN IPs from display text."""
+    if not text:
+        return text
+    s = _HOME_PATH.sub("~", text)
+    s = _HOME_SLUG.sub("~-", s)
+    s = _TS_NET.sub(r"\1", s)
+    s = _PAREN_HOST_IPS.sub("", s)
+    s = _PRIV_IP_PORT.sub(r":\1", s)
+    s = re.sub(rf"\bSSH\s+{_PRIV_IP}\b", "SSH host", s)
+    s = _PRIV_IP_BARE.sub("", s)
+    s = re.sub(r"\bzero [A-Za-z]+ interventions\b", "zero operator interventions", s)
+    s = re.sub(r"  +", " ", s)
+    s = re.sub(r"\(\s+", "(", s)
+    s = re.sub(r"\s+\)", ")", s)
+    return s.strip()
 
 
 def parse_fraction(text: Any) -> Optional[tuple[int, int]]:

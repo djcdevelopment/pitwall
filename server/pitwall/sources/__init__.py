@@ -11,6 +11,8 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
+from ..util import scrub_identifiers
+
 
 @dataclass
 class SourceState:
@@ -114,7 +116,7 @@ class CacheSource:
             try:
                 payload, age = self._read_cache()
             except (OSError, ValueError) as exc:
-                cache_err = f"cache unreadable: {exc}"
+                cache_err = scrub_identifiers(f"cache unreadable: {exc}")
             if payload is not None and age is not None and age <= self.refresh_after_s:
                 self._accept(payload, "tui_cache", now)
                 st.last_error = ""
@@ -130,7 +132,7 @@ class CacheSource:
                 except subprocess.TimeoutExpired:
                     st.last_error = f"self-refresh timed out after {self.timeout_s:.0f}s"
                 except Exception as exc:  # noqa: BLE001 - isolate every failure
-                    st.last_error = f"self-refresh failed: {exc}"
+                    st.last_error = scrub_identifiers(f"self-refresh failed: {exc}")
                 if payload is not None and st.data is None:
                     self._accept(payload, "tui_cache", now)  # stale but readable: keep it, age shows
                 return
@@ -142,4 +144,4 @@ class CacheSource:
             elif cache_err and st.data is None:
                 st.last_error = cache_err
         except Exception as exc:  # noqa: BLE001
-            st.last_error = f"poll failed: {exc}"
+            st.last_error = scrub_identifiers(f"poll failed: {exc}")

@@ -48,7 +48,7 @@ cmd_start() {
     (cd "$ROOT/web" && npm ci --silent && npm run build --silent)
   fi
   cd "$ROOT"
-  PITWALL_PORT="$PORT" nohup "$ROOT/.venv/bin/python" -m pitwall >"$LOG" 2>&1 &
+  PITWALL_PORT="$PORT" setsid "$ROOT/.venv/bin/python" -m pitwall >"$LOG" 2>&1 </dev/null &
   echo $! >"$PIDFILE"
   for _ in $(seq 1 30); do
     if curl -fsS -m 1 "http://127.0.0.1:$PORT/api/health" >/dev/null 2>&1; then

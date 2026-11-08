@@ -16,7 +16,7 @@ from .contract import (
     NetworkLink, Overall, Routing, Seat, Service, Snapshot, SourceRecord, Stage, Task, TokenUse,
 )
 from .corrections import apply_fraction
-from .util import iso_from_epoch, loopback_url, parse_fraction, to_float, unknown
+from .util import iso_from_epoch, loopback_url, parse_fraction, scrub_identifiers, to_float, unknown
 
 COVERAGE_CAP = "flow-top returns at most 10 tasks and has no CLI option to raise that limit; older tasks are not shown."
 RESPONSIBILITY = {
@@ -118,8 +118,8 @@ def norm_fleet(fleet: Optional[dict], fleet_state: str, ctx: Ctx) -> dict:
         else:
             state = "idle"
         devices.append(Device(
-            id=str(d.get("device_id")), host_id=str(d.get("host_id")), title=str(d.get("short_title", "")),
-            hardware=str(d.get("hardware_identity", "")), mode=str(d.get("mode", "")), workload=str(d.get("workload_label", "")),
+            id=str(d.get("device_id")), host_id=str(d.get("host_id")), title=scrub_identifiers(str(d.get("short_title", ""))),
+            hardware=scrub_identifiers(str(d.get("hardware_identity", ""))), mode=str(d.get("mode", "")), workload=scrub_identifiers(str(d.get("workload_label", ""))),
             owner=str(d.get("owner_label", "")), state=state,  # type: ignore[arg-type]
             utilization=util,
             memory_used=reading(d.get("vram_measured_used_gib"), "GiB", ctx, obs_d, reach),
@@ -161,7 +161,7 @@ def norm_fleet(fleet: Optional[dict], fleet_state: str, ctx: Ctx) -> dict:
         else:
             state = "idle"
         cl = e.get("context_len")
-        seats.append(Seat(id=eid, host_id=str(e.get("host_id")), label=str(e.get("label", eid)), model=str(e.get("model_id", "")),
+        seats.append(Seat(id=eid, host_id=str(e.get("host_id")), label=scrub_identifiers(str(e.get("label", eid))), model=str(e.get("model_id", "")),
                           state=state, health=health, occupancy=occ, queued=queued, generation_rate=gen,  # type: ignore[arg-type]
                           context_tokens=cl if isinstance(cl, int) and not isinstance(cl, bool) else None, device_ids=dev_ids))
 
@@ -223,10 +223,10 @@ def norm_fleet(fleet: Optional[dict], fleet_state: str, ctx: Ctx) -> dict:
             hs = "idle"
         else:
             hs = "unknown"
-        hosts.append(Host(id=str(hid), label=HOST_ROLE.get(str(hid), str(hid).upper()), role=str(lbl), state=hs))  # type: ignore[arg-type]
-    notes = [str(x) for x in (fleet.get("known_blind_spots") or [])]
+        hosts.append(Host(id=str(hid), label=HOST_ROLE.get(str(hid), str(hid).upper()), role=scrub_identifiers(str(lbl)), state=hs))  # type: ignore[arg-type]
+    notes = [scrub_identifiers(str(x)) for x in (fleet.get("known_blind_spots") or [])]
     return {"hosts": hosts, "devices": devices, "seats": seats, "engine_caches": engine, "notes": notes, "slots": (act_total, cap_total),
-            "reason": str(summ.get("state_reason", ""))}
+            "reason": scrub_identifiers(str(summ.get("state_reason", "")))}
 
 
 # ---- flow services -------------------------------------------------------------------------------
@@ -257,8 +257,8 @@ def norm_services(flow: Optional[dict], flow_state: str, ctx: Ctx, endpoint_rows
                                   reason=f"{s.get('name', sid)} unreachable at last probe ({s.get('detail', '')})" if state == "unreachable" else "")
         out.append(Service(
             id=str(sid), name=str(s.get("name", sid)), responsibility=RESPONSIBILITY.get(str(sid), ""),
-            endpoint=str(s.get("host_endpoint", "")), state=state,  # type: ignore[arg-type]
-            detail=str(s.get("detail", "")), source=ctx.src(str(s.get("source", "flow-top"))), age_s=to_float(s.get("obs_age_s")), link=link,
+            endpoint=scrub_identifiers(str(s.get("host_endpoint", ""))), state=state,  # type: ignore[arg-type]
+            detail=scrub_identifiers(str(s.get("detail", ""))), source=ctx.src(scrub_identifiers(str(s.get("source", "flow-top")))), age_s=to_float(s.get("obs_age_s")), link=link,
         ))
         if sid == "aspire":
             out.append(_irc_row(ctx))
@@ -381,7 +381,7 @@ def build_task(ft: dict, view: P.ReceiptView, services: dict[str, str], ctx: Ctx
         attention = ""
     return Task(
         id=tid, title=str(ft.get("title", tid)), short_title=str(ft.get("human_title") or ft.get("title") or tid), actor=str(ft.get("actor", "")),
-        host=str(ft.get("host", "")), stage=str(ft.get("stage", "")), stages=stages, latest_progress=str(ft.get("last_progress", "")),
+        host=scrub_identifiers(str(ft.get("host", ""))), stage=str(ft.get("stage", "")), stages=stages, latest_progress=scrub_identifiers(str(ft.get("last_progress", ""))),
         latest_progress_at=str(ft.get("last_progress_utc") or "") or None, outcome=outcome, checks=checks, review=review, delivery=delivery,
         attention=attention, durations=durations, tokens=tokens, routing=routing, path=path, context=context, caches=caches,
         duckdb=P.derive_duckdb_steps(view), artifacts=P.derive_artifacts(view), links=links,

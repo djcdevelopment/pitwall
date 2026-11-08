@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 from .contract import EvidenceIndex, EvidenceRecord
+from .util import scrub_identifiers
 
 SERVED_EXT = {".json": "json", ".jsonl": "jsonl", ".md": "markdown", ".png": "image"}
 DENY_NAME = re.compile(r"(?i)(key|secret|credential|\.env|passw)")
@@ -33,7 +34,7 @@ REDACTED = "[redacted]"
 
 
 def scrub_text(text: str) -> str:
-    return _BEARER.sub("Bearer [redacted]", text)
+    return scrub_identifiers(_BEARER.sub("Bearer [redacted]", text))
 
 
 def scrub_value(v: Any, key: str = "") -> Any:

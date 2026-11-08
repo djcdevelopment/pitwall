@@ -80,7 +80,7 @@ def docker_state(name: str) -> dict:
 def configured_entities(path: str) -> Optional[list[str]]:
     """Names from an emulator's startup config. Names only; null when unreadable."""
     try:
-        d = json.loads(Path(path).read_text(encoding="utf-8"))
+        d = json.loads(Path(path).expanduser().read_text(encoding="utf-8"))
         names: list[str] = []
         for ns in d["UserConfig"]["Namespaces"]:
             names += [q["Name"] for q in ns.get("Queues", [])] + [t["Name"] for t in ns.get("Topics", [])]
