@@ -149,8 +149,11 @@ export function ch6(c: Ctx, withServices: boolean): HTMLElement {
       st("Source snapshot read", d.source_snapshot_read, d.source_snapshot_detail), st("Transition written", d.transition_written, d.transition_written_detail), st("Transition read back", d.transition_read_back, d.transition_read_back_detail));
   } else left.push(h("div", { class: "empty-note" }, "No task selected."));
   const queueSvc = c.sn.services.find((s) => s.backlog);
-  if (queueSvc?.backlog) left.push(h("div", { class: "cl cl-h" }, h("span", { class: "k" }, "Brokers")),
-    h("div", { class: "cl", title: queueSvc.backlog.note }, h("span", { class: "k" }, "BH2 queue backlog"), h("span", { class: "grow" }), reading(queueSvc.backlog)));
+  if (queueSvc?.backlog) {
+    const qLabel = /washplant/i.test(`${queueSvc.responsibility} ${queueSvc.backlog.note}`) ? "Washplant queue backlog" : "BH2 queue backlog";
+    left.push(h("div", { class: "cl cl-h" }, h("span", { class: "k" }, "Brokers")),
+      h("div", { class: "cl", title: queueSvc.backlog.note }, h("span", { class: "k" }, qLabel), h("span", { class: "grow" }), reading(queueSvc.backlog)));
+  }
   left.push(h("div", { class: "cl cl-h" }, h("span", { class: "k" }, "Network")));
   if (c.sn.network.length === 0) left.push(h("div", { class: "cl" }, h("span", { class: "k" }, "OMEN-AM4 Network latency"), h("span", { class: "grow" }), reading(null)));
   for (const l of c.sn.network) left.push(h("div", { class: "cl nl", title: l.latency.note || undefined }, h("span", { class: "k" }, l.label), h("span", { class: "grow" }), reading(l.latency)),

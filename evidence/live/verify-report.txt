@@ -1,8 +1,8 @@
 desktop 1400x900 scrollHeight=900 hOverflow=false
 strip 1400x140 scrollHeight=140 hOverflow=false
 strip-1024 1024x140 scrollHeight=140 hOverflow=false
-tablet 820x1180 scrollHeight=2926 hOverflow=false
-narrow 390x844 scrollHeight=4633 hOverflow=false
+tablet 820x1180 scrollHeight=3107 hOverflow=false
+narrow 390x844 scrollHeight=4851 hOverflow=false
 selection across views {"Desktop":{"task":true,"recovered":true,"hash":"#mode=live&window=300&task=help-orland-throughput-20261104"},"Strip":{"task":true,"recovered":false,"hash":"#mode=live&window=300&task=help-orland-throughput-20261104"},"Narrow":{"task":true,"recovered":true,"hash":"#mode=live&window=300&task=help-orland-throughput-20261104"}}
 desktop contains 3/9 true
 desktop contains producer true
@@ -10,7 +10,7 @@ desktop contains 4/9 true
 desktop contains 7,092 true
 desktop contains 8,462 true
 desktop contains unknown true
-desktop contains unreachable true
+desktop contains unreachable false
 desktop contains Source snapshot true
 desktop contains Transition written true
 desktop contains Transition read back true
@@ -22,39 +22,39 @@ desktop lacks time saved true
 desktop lacks auto-adopted true
 desktop lacks ETA true
 desktop lacks CLUSTER-88 true
-export pitwall-live-2026-11-05T04-46-24-874Z.json bytes=141935 schema=pitwall.v1 mode=live
+export pitwall-live-2026-11-08T06-02-44-121Z.json bytes=152735 schema=pitwall.v1 mode=live
 evidence drawer lists BROKER or IRC true
-demo api idle mode=demo nonDemoSources=0 outcomes=recovered,completed exception=none bytes=84432
+demo api idle mode=demo nonDemoSources=0 outcomes=recovered,completed exception=none bytes=85642
 demo size idle desktop {"sh":900,"sw":1400,"cw":1400} scenarioOptions=4
 demo label idle desktop true
 demo size idle strip {"sh":140,"sw":1400,"cw":1400} scenarioOptions=0
 demo label idle strip true
-demo size idle narrow {"sh":4214,"sw":390,"cw":390} scenarioOptions=4
+demo size idle narrow {"sh":4215,"sw":390,"cw":390} scenarioOptions=4
 demo label idle narrow true
-demo api active mode=demo nonDemoSources=0 outcomes=active,recovered,completed exception=none bytes=85404
+demo api active mode=demo nonDemoSources=0 outcomes=active,recovered,completed exception=none bytes=86662
 demo size active desktop {"sh":900,"sw":1400,"cw":1400} scenarioOptions=4
 demo label active desktop true
 demo size active strip {"sh":140,"sw":1400,"cw":1400} scenarioOptions=0
 demo label active strip true
-demo size active narrow {"sh":4138,"sw":390,"cw":390} scenarioOptions=4
+demo size active narrow {"sh":4139,"sw":390,"cw":390} scenarioOptions=4
 demo label active narrow true
-demo api degraded mode=demo nonDemoSources=0 outcomes=recovered,completed exception=service bytes=85741
+demo api degraded mode=demo nonDemoSources=0 outcomes=recovered,completed exception=service bytes=86943
 demo size degraded desktop {"sh":900,"sw":1400,"cw":1400} scenarioOptions=4
 xss img present in DOM as element 0
 demo label degraded desktop true
 demo size degraded strip {"sh":140,"sw":1400,"cw":1400} scenarioOptions=0
 xss img present in DOM as element 0
 demo label degraded strip true
-demo size degraded narrow {"sh":4322,"sw":390,"cw":390} scenarioOptions=4
+demo size degraded narrow {"sh":4324,"sw":390,"cw":390} scenarioOptions=4
 xss img present in DOM as element 0
 demo label degraded narrow true
-demo api recovered mode=demo nonDemoSources=0 outcomes=recovered,completed exception=none bytes=38908
+demo api recovered mode=demo nonDemoSources=0 outcomes=recovered,completed exception=none bytes=39320
 demo size recovered desktop {"sh":900,"sw":1400,"cw":1400} scenarioOptions=4
 demo label recovered desktop true
 demo size recovered strip {"sh":140,"sw":1400,"cw":1400} scenarioOptions=0
 demo label recovered strip true
 demo size recovered narrow {"sh":4024,"sw":390,"cw":390} scenarioOptions=4
 demo label recovered narrow true
-browser 60s taskTime=0.62s cpuShare=1.0% jsHeapMiB=2.0 nodes=5757 layouts=122
+browser 60s taskTime=0.61s cpuShare=1.0% jsHeapMiB=1.6 nodes=4547 layouts=112
 external requests none
 page errors none

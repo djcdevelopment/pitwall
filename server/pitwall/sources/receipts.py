@@ -15,7 +15,7 @@ PARSE_JSON = {
     "execution.json", "job-succeeded.json", "job-running.json", "job-queued.json", "submitted.json",
     "LOOKUP-MEASURE.json", "CONTEXT-DELIVERY.json", "PACK-CACHE-RECEIPTS.json", "DUCKDB-RECEIPT.json",
     "PARENT-CHECKS.json", "REVIEW-BUNDLE.json", "CHECKS.json", "consumption.json", "RESULT.json",
-    "RECOVERY.json", "SUMMARY.json",
+    "RECOVERY.json", "SUMMARY.json", "TICKET-INVOKE.json",
 }
 PARSE_JSONL = {"BROKER-RECEIPTS.jsonl", "IRC-RECEIPTS.jsonl"}
 MAX_PARSE_BYTES = 512 * 1024

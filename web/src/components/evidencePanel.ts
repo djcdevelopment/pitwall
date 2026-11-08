@@ -57,7 +57,28 @@ export function evidencePanel(ev: EvidenceState, sn: Snapshot, task: Task | null
     recs.appendChild(ns);
   }
   body.appendChild(recs);
-  const svcs = h("section", { class: "ev-sec", "data-sec": "services" }, h("h3", {}, "Services, now"), servicesList({ sn, hist: null, task, details: () => undefined }));
+  const svcs = h("section", { class: "ev-sec", "data-sec": "services" });
+  if (sn.campaign) {
+    const c = sn.campaign;
+    svcs.appendChild(h("h3", {}, "Steppewise + Consul (M0\u2013M8) Campaign & Deployment Boundaries"));
+    svcs.appendChild(h("div", { class: "ev-hop" },
+      h("div", { class: "ev-hop-h" }, h("b", {}, c.title), badge("attention", `verdict: ${c.verdict}`)),
+      h("div", { class: "ev-line" }, `Deployed to HEARTH :8710: ${c.deployed_commits} | ${c.deployed_hashes_verified}`),
+      h("div", { class: "ev-line" }, `Live Consul control plane: ${c.active_units} | ${c.passing_seats}`),
+      h("div", { class: "ev-line" }, `M5 Stage 4 (300s): ${c.stage4_draws ?? 0} successes (${c.stage4_rate_per_min ?? 0}/min), ${c.stage4_duplicate_terminals ?? 0} dupes, ${c.stage4_reconciled_acks ?? 0} lost ACKs reconciled`),
+      h("div", { class: "ev-line dim" }, `Stage 4 GPU >50% gate: ${c.stage4_util_gate}`),
+      h("div", { class: "ev-line dim" }, `Stage 4 scope: ${c.stage4_note}`),
+      c.h3_backup_warning ? h("div", { class: "ev-line ev-warn" }, c.h3_backup_warning) : null));
+    for (const m of c.milestones) {
+      const bk = (["completed", "active", "attention", "unknown", "failed", "stale", "idle"].includes(m.badge) ? m.badge : "unknown") as Parameters<typeof badge>[0];
+      svcs.appendChild(h("div", { class: "ev-hop" },
+        h("div", { class: "ev-hop-h" }, h("b", {}, m.label), badge(bk, m.state)),
+        h("div", { class: "ev-line" }, m.summary),
+        m.limits ? h("div", { class: "ev-line dim" }, "boundary: ", m.limits) : null));
+    }
+  }
+  svcs.appendChild(h("h3", {}, "Services, now"));
+  svcs.appendChild(servicesList({ sn, hist: null, task, details: () => undefined }));
   body.appendChild(svcs);
   const srcs = h("section", { class: "ev-sec", "data-sec": "sources" }, h("h3", {}, "Sources and collector versions"),
     h("p", { class: "ev-warn" }, "Collectors are external checkouts. Pitwall's clean Git status does not pin them, so these readings are not reproducible from a Pitwall commit alone."));

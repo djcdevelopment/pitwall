@@ -213,6 +213,11 @@ class Routing(BaseModel):
     routed_by: str = ""
     regime: str = ""
     job_id: str = ""
+    execution_mode: Optional[str] = None
+    fence_epoch: Optional[int] = None
+    generation: Optional[str] = None
+    consul_index: Optional[int] = None
+    thinking_source: Optional[str] = None
 
 
 class Correction(BaseModel):
@@ -311,6 +316,34 @@ class Overall(BaseModel):
     reason: str
 
 
+class CampaignMilestone(BaseModel):
+    id: str
+    label: str
+    state: str
+    badge: str
+    summary: str
+    limits: str = ""
+
+
+class CampaignSummary(BaseModel):
+    id: str
+    title: str
+    verdict: str
+    updated_at: str
+    deployed_commits: str
+    deployed_hashes_verified: str
+    active_units: str
+    passing_seats: str
+    stage4_draws: Optional[int] = None
+    stage4_rate_per_min: Optional[float] = None
+    stage4_reconciled_acks: Optional[int] = None
+    stage4_duplicate_terminals: Optional[int] = None
+    stage4_util_gate: str = ""
+    stage4_note: str = ""
+    h3_backup_warning: str = ""
+    milestones: list[CampaignMilestone] = Field(default_factory=list)
+
+
 class Snapshot(BaseModel):
     schema_: str = Field(default=SCHEMA, alias="schema")
     seq: int
@@ -331,6 +364,7 @@ class Snapshot(BaseModel):
     default_task_id: Optional[str] = None
     coverage_notes: list[str] = Field(default_factory=list)
     history_started_at: Optional[str] = None
+    campaign: Optional[CampaignSummary] = None
 
     model_config = {"populate_by_name": True}
 

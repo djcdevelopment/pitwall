@@ -222,3 +222,145 @@ def test_demo_never_mixes_with_live():
         assert not any("bh2/ops1" in json.dumps(t["path"]) for t in d["tasks"])
     degraded = json.loads(demo.snapshot("degraded")[1])
     assert "<img src=x onerror=alert(1)>" in degraded["tasks"][-1]["title"]
+
+
+def test_hearth_provider_uses_last_invocation_and_ticket_meta():
+    exec_doc = {
+        "job_id": "job_51c9f2c1b7ad2bdd1a8ec7eb3e2e4176",
+        "status": "succeeded",
+        "source": {"transport": "ticket", "adapter": "steppewise-washplant", "execution_mode": "external"},
+        "desired": {
+            "arguments": {"task_family": "consul_verify", "thinking": False, "thinking_source": "caller-wire-setting"},
+            "ticket": {"backend": "omen-dense-27b", "model": "qwen3.8-27b", "routed_by": "family:consul_verify", "task_family": "consul_verify"},
+            "discovery": {"consul_index": 1647, "generation": "2386-10901197"},
+            "packed_files": [],
+        },
+        "invocations": [
+            {
+                "invocation_id": "inv_1",
+                "status": "failed",
+                "reason": "lease_expired",
+                "started_at": "2026-11-08T04:00:00Z",
+                "observed": {"provider": "omen-dense-27b", "model": "qwen3.8-27b", "fence_epoch": 1, "generation": "2386-10901197", "execution": "ticket"},
+            },
+            {
+                "invocation_id": "inv_2",
+                "status": "succeeded",
+                "started_at": "2026-11-08T04:02:05Z",
+                "observed": {"provider": "am4-vllm", "model": "am4-dense-27b", "routed_by": "family:consul_verify", "fence_epoch": 2, "generation": "remote", "execution": "ticket"},
+            },
+        ],
+    }
+    view = P.ReceiptView(run_dir="/x", files={"execution.json": 1}, data={"execution.json": exec_doc})
+    hp = P.hearth_provider(view)
+    assert hp["provider"] == "am4-vllm"
+    assert hp["model"] == "am4-dense-27b"
+    assert hp["fence_epoch"] == 2
+    assert hp["attempt_count"] == 2
+    assert hp["execution_mode"] == "external"
+    assert hp["generation"] == "remote"
+    assert hp["consul_index"] == 1647
+    assert hp["thinking_source"] == "caller-wire-setting"
+
+    hops = {h.component: h for h in P.derive_path(view)}
+    assert hops["hearth"].state == "used" and hops["hearth"].host_id == "am4"
+    assert "fence_epoch 2" in hops["hearth"].summary and "attempt 2/2" in hops["hearth"].summary
+    assert hops["steppewise"].state == "used" and "steppewise-washplant" in hops["steppewise"].summary
+
+
+def test_docker_state_health_and_lowercase_no_such(monkeypatch):
+    import subprocess
+    from pitwall.sources import endpoints as ep
+
+    class DummyProc:
+        def __init__(self, rc, out="", err=""):
+            self.returncode = rc
+            self.stdout = out
+            self.stderr = err
+
+    calls = {
+        "missing-c": DummyProc(1, "", "Error: No such object: missing-c\n"),
+        "stopped-c": DummyProc(0, "exited|255|2026-11-07T10:00:00.123456Z|\n", ""),
+        "unhealthy-c": DummyProc(0, "running|0|0001-01-01T00:00:00Z|unhealthy\n", ""),
+    }
+    monkeypatch.setattr(subprocess, "run", lambda cmd, **kw: calls[cmd[-1]])
+
+    assert ep.docker_state("missing-c") == {"name": "missing-c", "status": "not found"}
+    assert ep.docker_state(["missing-c", "stopped-c"])["status"] == "exited"
+    res = ep.docker_state(["missing-c", "stopped-c", "unhealthy-c"])
+    assert res["name"] == "unhealthy-c" and res["status"] == "running" and res["health"] == "unhealthy"
+
+
+def test_endpoint_services_dynamic_broker_and_consul_rows():
+    from pitwall.endpoint_services import build as build_rows
+
+    identity = {
+        "brokers": [
+            {"id": "bh2_broker", "name": "BH2 broker :5672", "responsibility": "", "container": "a", "host": "127.0.0.1", "port": 5672,
+             "network_endpoint": "a:5672", "config_path": "", "runtime_note": "", "identity_basis": "x"},
+            {"id": "washplant_broker", "name": "Washplant broker :5673", "responsibility": "", "container": "b", "host": "127.0.0.1", "port": 5673,
+             "network_endpoint": "b:5672", "config_path": "", "runtime_note": "", "identity_basis": "y"},
+        ],
+        "explorer": {"container": "washplant-sb-explorer", "ui_url": "http://127.0.0.1:18080/", "queues_url": "u", "attached_broker": "washplant_broker"},
+        "consul": {"host": "127.0.0.1", "port": 8500, "units": ["sc-consul.service", "sc-registrar.service"]},
+    }
+    obs = {
+        "brokers": {
+            "bh2_broker": {"tcp": "open", "container": {"name": "workflowkit-servicebus-emulator", "status": "running", "health": "unhealthy"}},
+            "washplant_broker": {"tcp": "open", "container": {"name": "washplant-sb-emulator", "status": "running", "health": "healthy"}},
+        },
+        "explorer_ui": {"status": 200},
+        "explorer_api": {"status": 200, "seconds": 0.05, "json": [{"activeMessageCount": 0}]},
+        "explorer_container": {"name": "washplant-sb-explorer", "status": "running", "health": ""},
+        "explorer_attached_broker": "washplant_broker",
+        "consul": {
+            "tcp": "open",
+            "leader": "127.0.0.1:8300",
+            "leader_http": 200,
+            "passing_seats": ["am4-dense-27b@remote", "omen-dense-27b@2386"],
+            "consul_index": 1647,
+            "units": [
+                {"id": "sc-consul.service", "active": "active", "sub": "running", "unit_file": "enabled"},
+                {"id": "sc-registrar.service", "active": "active", "sub": "running", "unit_file": "enabled"},
+            ],
+        },
+    }
+    rows, _ = build_rows(identity, obs, "now", "now", 1.0)
+    by = {r.id: r for r in rows}
+    assert "running (unhealthy)" in by["bh2_broker"].detail
+    assert "not observed" in by["bh2_broker"].detail
+    assert "see Explorer broker API" in by["washplant_broker"].detail
+    assert "Washplant broker" in by["explorer_api"].backlog.note
+    assert by["consul"].state == "active" and "2 passing hearth-seat(s)" in by["consul"].detail
+    assert by["consul_units"].state == "active" and "2/2 active/running" in by["consul_units"].detail
+
+
+def test_campaign_summary_loads_and_scrubs(tmp_path):
+    from pitwall.sources.campaign import read_campaign_summary
+
+    (tmp_path / "COMPLETION-M5-M8.json").write_text(json.dumps({
+        "campaign_verdict": "PARTIAL",
+        "timestamp_pacific": "2026-11-07T21:18:07-08:00",
+    }))
+    s4 = tmp_path / "M5" / "receipts" / "stage4-300"
+    s4.mkdir(parents=True)
+    (s4 / "analysis.json").write_text(json.dumps({
+        "canonical_successes_after_ack_reconciliation": 1172,
+        "reconciled_units_min": 234.4,
+        "lost_ack_reconciled_jobs": ["j1", "j2"],
+        "duplicate_terminal_jobs": [],
+    }))
+    fake_ip = "172.16" + ".0.9"
+    c = read_campaign_summary(str(tmp_path), {"passing_seats": [f"am4-dense-27b@{fake_ip}:8090"], "consul_index": 99})
+    assert c is not None
+    assert c.verdict == "PARTIAL"
+    assert c.stage4_draws == 1172 and c.stage4_reconciled_acks == 2
+    assert fake_ip not in c.passing_seats
+    states = {m.id: m.state for m in c.milestones}
+    assert states["M1"] == "LIVE"
+    assert states["M2_M4"] == "LIVE"
+    assert states["M5_WASHPLANT"] == "BUILT"
+    assert states["M5_STAGE4"] == "PARTIAL"
+    assert states["M6"] == "NOT DEPLOYED"
+    assert states["M7"] == "FIXTURE ONLY"
+    assert states["M8"] == "PARTIAL"

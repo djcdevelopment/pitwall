@@ -28,14 +28,16 @@
     }
   ],
   "explorer": {
-    "container": "bh2-servicebus-explorer",
+    "container": "washplant-sb-explorer",
+    "containers": ["washplant-sb-explorer", "bh2-servicebus-explorer"],
     "ui_url": "http://127.0.0.1:18080/",
     "queues_url": "http://127.0.0.1:18080/api/queues/",
-    "attached_broker": "bh2_broker",
-    "identity_basis": "bh2-servicebus-explorer runs on network workflowkit-servicebus_sb-emulator with sb://workflowkit-servicebus-emulator; it cannot see Washplant's broker."
+    "attached_broker": "washplant_broker",
+    "identity_basis": "washplant-sb-explorer runs on network washplant_default with sb://washplant-sb-emulator (:5673); bh2-servicebus-explorer attaches to workflowkit-servicebus-emulator (:5672)."
   },
   "aspire": {
-    "container": "lap1-aspire-dashboard",
+    "container": "omen-aspire-dashboard",
+    "containers": ["omen-aspire-dashboard", "lap1-aspire-dashboard"],
     "ui_host": "127.0.0.1",
     "ui_port": 18888,
     "ui_url": "http://127.0.0.1:18888",
@@ -43,5 +45,19 @@
       { "label": "gRPC", "port": 4317 },
       { "label": "HTTP", "port": 4318 }
     ]
+  },
+  "consul": {
+    "host": "127.0.0.1",
+    "port": 8500,
+    "leader_url": "http://127.0.0.1:8500/v1/status/leader",
+    "units": [
+      "sc-consul.service",
+      "sc-registrar.service",
+      "sc-observer.service",
+      "sc-watch-checks.service",
+      "sc-watch-passing.service"
+    ],
+    "receipts_dir": "~/work/steppewise-consul-20261107/M1/receipts",
+    "campaign_dir": "~/work/steppewise-consul-20261107"
   }
 }

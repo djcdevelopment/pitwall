@@ -184,6 +184,11 @@ export interface Routing {
   routed_by: string;
   regime: string;
   job_id: string;
+  execution_mode?: string | null;
+  fence_epoch?: number | null;
+  generation?: string | null;
+  consul_index?: number | null;
+  thinking_source?: string | null;
 }
 
 export interface Correction {
@@ -274,6 +279,34 @@ export interface Overall {
   reason: string;
 }
 
+export interface CampaignMilestone {
+  id: string;
+  label: string;
+  state: string;
+  badge: string;
+  summary: string;
+  limits: string;
+}
+
+export interface CampaignSummary {
+  id: string;
+  title: string;
+  verdict: string;
+  updated_at: string;
+  deployed_commits: string;
+  deployed_hashes_verified: string;
+  active_units: string;
+  passing_seats: string;
+  stage4_draws: number | null;
+  stage4_rate_per_min: number | null;
+  stage4_reconciled_acks: number | null;
+  stage4_duplicate_terminals: number | null;
+  stage4_util_gate: string;
+  stage4_note: string;
+  h3_backup_warning: string;
+  milestones: CampaignMilestone[];
+}
+
 export interface Snapshot {
   schema: string;
   seq: number;
@@ -294,6 +327,7 @@ export interface Snapshot {
   default_task_id: string | null;
   coverage_notes: string[];
   history_started_at: string | null;
+  campaign?: CampaignSummary | null;
 }
 
 export interface Series {

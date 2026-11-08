@@ -34,9 +34,18 @@ export function resultPanel(t: Task, openRecord: (rec: string | null, fid: strin
     tokenRow("In", tk.tokens_in, tk.budget_in), tokenRow("Out", tk.tokens_out, tk.budget_out), tokenRow("Calls", tk.model_calls, tk.budget_calls),
     h("div", { class: "dim" }, `reasoning ${tk.tokens_reasoning === null ? "unknown" : fmtNum(tk.tokens_reasoning)} | emit repairs ${tk.emit_repairs === null ? "unknown" : fmtNum(tk.emit_repairs)}`));
   const r = t.routing;
+  const rtRows: [string, string][] = [["family", r.task_family], ["provider", r.provider], ["model", r.model], ["routed_by", r.routed_by], ["regime", r.regime], ["job", r.job_id]];
+  if (r.execution_mode || (r.fence_epoch !== null && r.fence_epoch !== undefined)) {
+    rtRows.push(["mode", `${r.execution_mode ?? "ticket"}${r.fence_epoch !== null && r.fence_epoch !== undefined ? ` (epoch ${r.fence_epoch})` : ""}`]);
+  }
+  if (r.generation || (r.consul_index !== null && r.consul_index !== undefined)) {
+    rtRows.push(["consul", `gen ${r.generation ?? "?"}${r.consul_index !== null && r.consul_index !== undefined ? ` @${r.consul_index}` : ""}`]);
+  }
+  if (r.thinking_source) {
+    rtRows.push(["thinking_src", r.thinking_source]);
+  }
   const routing = h("div", { class: "sub" }, h("h4", {}, "HEARTH routing"),
-    h("div", { class: "rt" }, ...([["family", r.task_family], ["provider", r.provider], ["model", r.model], ["routed_by", r.routed_by], ["regime", r.regime], ["job", r.job_id]] as const)
-      .map(([k, v]) => h("div", { class: "rt-i", title: `${k}: ${v}` }, h("span", { class: "k" }, k), h("span", { class: "mono-wrap" }, v || "unknown")))));
+    h("div", { class: "rt" }, ...rtRows.map(([k, v]) => h("div", { class: "rt-i", title: `${k}: ${v}` }, h("span", { class: "k" }, k), h("span", { class: "mono-wrap" }, v || "unknown")))));
   const arts = expanded ? t.artifacts : t.artifacts.slice(0, 3);
   const artEl = h("div", { class: "sub" }, h("h4", {}, "Artifacts"),
     t.artifacts.length === 0 ? h("div", { class: "empty-note" }, "No artifact references.") : null,

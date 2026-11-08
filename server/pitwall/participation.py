@@ -94,18 +94,47 @@ def hearth_provider(view: ReceiptView) -> dict:
     name, d = _exec_doc(view)
     if not d:
         return {}
-    inv = (d.get("invocations") or [{}])[0] if isinstance(d.get("invocations"), list) else {}
+    invs = [x for x in (d.get("invocations") or []) if isinstance(x, dict)] if isinstance(d.get("invocations"), list) else []
+    inv = invs[-1] if invs else {}
+    obs = inv.get("observed") if isinstance(inv.get("observed"), dict) else {}
+    desired = d.get("desired") if isinstance(d.get("desired"), dict) else {}
+    ticket = desired.get("ticket") if isinstance(desired.get("ticket"), dict) else {}
+    disc = desired.get("discovery") if isinstance(desired.get("discovery"), dict) else {}
+    src = d.get("source") if isinstance(d.get("source"), dict) else {}
+    args = desired.get("arguments") if isinstance(desired.get("arguments"), dict) else {}
     cap = d.get("capability") if isinstance(d.get("capability"), dict) else {}
+    fe = obs.get("fence_epoch") if isinstance(obs.get("fence_epoch"), int) else (ticket.get("fence_epoch") if isinstance(ticket.get("fence_epoch"), int) else None)
+    cidx = disc.get("consul_index") if isinstance(disc.get("consul_index"), int) and not isinstance(disc.get("consul_index"), bool) else None
+    gen = obs.get("generation") or ticket.get("generation") or disc.get("generation") or None
+    mode = src.get("execution_mode") or obs.get("execution") or None
     return {
         "file": name,
-        "provider": d.get("provider") or "",
-        "model": d.get("model") or "",
+        "provider": obs.get("provider") or inv.get("provider") or d.get("provider") or ticket.get("backend") or "",
+        "model": obs.get("model") or inv.get("model") or d.get("model") or ticket.get("model") or "",
         "job_id": d.get("job_id") or "",
-        "routed_by": d.get("routed_by") or "",
-        "task_family": d.get("task_family") or "",
-        "status": d.get("status") or "",
+        "routed_by": obs.get("routed_by") or d.get("routed_by") or ticket.get("routed_by") or "",
+        "task_family": d.get("task_family") or ticket.get("task_family") or args.get("task_family") or "",
+        "status": d.get("status") or inv.get("status") or "",
         "node": cap.get("node") or (inv.get("capability") or {}).get("node") or "",
         "started_at": inv.get("started_at") or d.get("created_at") or "",
+        "attempt_count": len(invs) if invs else 1,
+        "execution_mode": str(mode) if mode else None,
+        "fence_epoch": fe,
+        "generation": str(gen) if gen else None,
+        "consul_index": cidx,
+        "thinking_source": str(args["thinking_source"]) if args.get("thinking_source") else None,
+        "adapter": str(src.get("adapter") or ""),
+    }
+
+
+def hearth_ticket_meta(view: ReceiptView) -> dict:
+    hp = hearth_provider(view)
+    if not hp:
+        return {}
+    return {
+        k: hp.get(k)
+        for k in ("execution_mode", "fence_epoch", "generation", "consul_index", "thinking_source", "attempt_count")
+        if hp.get(k) is not None
     }
 
 
@@ -174,8 +203,18 @@ def derive_path(view: ReceiptView, task_active: bool = False, irc_status: str = 
     if hp:
         host = _host_from_provider(hp["provider"], hp["node"]) or "omen"
         active = task_active and str(hp["status"]).lower() not in _TERMINAL
+        extra_bits = []
+        if hp.get("execution_mode"):
+            extra_bits.append(f"mode {hp['execution_mode']}")
+        if hp.get("fence_epoch") is not None:
+            extra_bits.append(f"fence_epoch {hp['fence_epoch']}")
+        if hp.get("attempt_count", 1) > 1:
+            extra_bits.append(f"attempt {hp['attempt_count']}/{hp['attempt_count']}")
+        if hp.get("generation"):
+            extra_bits.append(f"gen {hp['generation']}")
+        extra_str = (", " + ", ".join(extra_bits)) if extra_bits else ""
         hops.append(_hop(view, "hearth", "active" if active else "used",
-                         f"{hp['provider']} ({hp['model']}), job {str(hp['job_id'])[:20]}, status {hp['status']}",
+                         f"{hp['provider']} ({hp['model']}), job {str(hp['job_id'])[:20]}, status {hp['status']}{extra_str}",
                          f"{hp['file']}: provider, model, job_id, status", host, view.rid(hp["file"]), hp["started_at"]))
     else:
         run = next((n for n in ("job-running.json", "job-queued.json", "submitted.json") if view.js(n)), "")
@@ -191,11 +230,20 @@ def derive_path(view: ReceiptView, task_active: bool = False, irc_status: str = 
 
     # Steppewise / MAF
     lm = view.js("LOOKUP-MEASURE.json")
+    ti = view.js("TICKET-INVOKE.json")
     if lm:
         dur = to_float(lm.get("duration_ms"))
         hops.append(_hop(view, "steppewise", "used",
                          f"reviewed lookup{f' in {dur:.0f} ms' if dur is not None else ''}; {lm.get('execution', '')}".strip(),
                          "LOOKUP-MEASURE.json", "omen", view.rid("LOOKUP-MEASURE.json"), lm.get("started_at")))
+    elif ti:
+        hops.append(_hop(view, "steppewise", "used",
+                         f"ticket-bound invoke ({ti.get('backend') or ti.get('model') or 'TicketInvoke'})",
+                         "TICKET-INVOKE.json", "omen", view.rid("TICKET-INVOKE.json"), ti.get("started_at")))
+    elif hp and hp.get("execution_mode") in ("external", "ticket") and any(k in hp.get("adapter", "").lower() for k in ("steppewise", "washplant", "ticket")):
+        hops.append(_hop(view, "steppewise", "used",
+                         f"ticket workflow adapter ({hp['adapter']}); fence_epoch {hp.get('fence_epoch') or 1}",
+                         f"{hp['file']}: source.adapter", "omen", view.rid(hp["file"]), hp.get("started_at")))
     elif "lookup-state" in view.dirs:
         hops.append(_hop(view, "steppewise", "used", "lookup events recorded", "lookup-state/ events directory", "omen"))
     else:

@@ -12,7 +12,7 @@ from typing import Any, Optional
 
 from . import participation as P
 from .contract import (
-    SCHEMA, ContextPack, Device, EngineCache, Exception_, Host, InspectionLink, JobCaches, Measurement,
+    SCHEMA, CampaignSummary, ContextPack, Device, EngineCache, Exception_, Host, InspectionLink, JobCaches, Measurement,
     NetworkLink, Overall, Routing, Seat, Service, Snapshot, SourceRecord, Stage, Task, TokenUse,
 )
 from .corrections import apply_fraction
@@ -309,7 +309,10 @@ def build_task(ft: dict, view: P.ReceiptView, services: dict[str, str], ctx: Ctx
     routing = Routing(
         task_family=str(hp.get("task_family") or ft.get("task_family") or ""), provider=str(hp.get("provider") or ft.get("hearth_provider") or ""),
         model=str(hp.get("model") or ft.get("hearth_model") or ""), routed_by=str(hp.get("routed_by") or ft.get("selected_route") or ""),
-        regime=str(ft.get("regime_summary") or ""), job_id=str(hp.get("job_id") or ft.get("hearth_job_id") or ""))
+        regime=str(ft.get("regime_summary") or ""), job_id=str(hp.get("job_id") or ft.get("hearth_job_id") or ""),
+        execution_mode=hp.get("execution_mode"), fence_epoch=hp.get("fence_epoch"),
+        generation=hp.get("generation"), consul_index=hp.get("consul_index"),
+        thinking_source=hp.get("thinking_source"))
     tokens = TokenUse(
         model_calls=_opt_int(ft.get("model_calls")), tokens_in=_opt_int(ft.get("tokens_in_total")), tokens_out=_opt_int(ft.get("tokens_out_total")),
         tokens_reasoning=_opt_int(ft.get("tokens_reasoning_total")), budget_in=_opt_int(ft.get("budget_tokens_in")),
@@ -395,7 +398,8 @@ def build_task(ft: dict, view: P.ReceiptView, services: dict[str, str], ctx: Ctx
 def build_snapshot(*, ctx: Ctx, generated_at: str, fleet: Optional[dict], flow: Optional[dict], fleet_rec: SourceRecord,
                    flow_rec: SourceRecord, receipts_rec: SourceRecord, views: dict[str, P.ReceiptView],
                    endpoint_rows: Optional[list[Service]] = None, endpoint_links: Optional[dict] = None,
-                   endpoints_rec: Optional[SourceRecord] = None) -> Snapshot:
+                   endpoints_rec: Optional[SourceRecord] = None,
+                   campaign: Optional[CampaignSummary] = None) -> Snapshot:
     fl = norm_fleet(fleet, fleet_rec.state, ctx)
     services = norm_services(flow, flow_rec.state, ctx, endpoint_rows)
     svc_state = {s.id: s.state for s in services}
@@ -463,5 +467,5 @@ def build_snapshot(*, ctx: Ctx, generated_at: str, fleet: Optional[dict], flow: 
         schema=SCHEMA, seq=0, mode=ctx.mode, scenario=ctx.scenario, scenario_note=ctx.scenario_note,  # type: ignore[call-arg]
         generated_at=generated_at, overall=overall, exception=exc, sources=[fleet_rec, flow_rec, receipts_rec] + ([endpoints_rec] if endpoints_rec else []), hosts=fl["hosts"],
         devices=fl["devices"], seats=fl["seats"], services=services, engine_caches=fl["engine_caches"], network=network, tasks=tasks,
-        default_task_id=default, coverage_notes=notes, history_started_at=ctx.history_started_at,
+        default_task_id=default, coverage_notes=notes, history_started_at=ctx.history_started_at, campaign=campaign,
     )

@@ -26,6 +26,7 @@ from .sources import fleet as fleet_src
 from .sources import flow as flow_src
 from .sources.receipts import ReceiptReader
 from .sources.endpoints import load_identity, observe
+from .sources.campaign import read_campaign_summary
 from .sources.version import read_version
 from .endpoint_services import build as build_endpoint_services
 from .util import iso_from_epoch, now_iso
@@ -97,6 +98,7 @@ class Store:
         while not self._stop.is_set():
             try:
                 self._endpoints = observe(self.identity, time.time())
+                self.rebuild()
             except Exception:  # noqa: BLE001 - a probe failure must not end the thread
                 pass
             self._stop.wait(self.cfg.endpoints_poll_s)
@@ -143,9 +145,12 @@ class Store:
             ep_rows, ep_links = build_endpoint_services(self.identity, ep, iso_from_epoch(now) or "", iso_from_epoch(ep_epoch), ep_age)
             ep_rec = SourceRecord(id="endpoints", label="Endpoint probes", state="idle" if ep and ep_age is not None and ep_age <= 60 else "stale" if ep else "unknown",
                                   path="direct_probes", observed_at=iso_from_epoch(ep_epoch), read_at=iso_from_epoch(now), age_s=ep_age, stale_after_s=60.0)
+            campaign_dir = str((self.identity.get("consul") or {}).get("campaign_dir") or "")
+            campaign = read_campaign_summary(campaign_dir, (ep or {}).get("consul")) if campaign_dir else None
             snap = build_snapshot(ctx=ctx, generated_at=now_iso(), fleet=fl.data, flow=fw.data, fleet_rec=fleet_rec, flow_rec=flow_rec,
                                   receipts_rec=receipts_rec, views=views, endpoint_rows=ep_rows if self.identity else None,
-                                  endpoint_links=ep_links, endpoints_rec=ep_rec if self.identity else None)
+                                  endpoint_links=ep_links, endpoints_rec=ep_rec if self.identity else None,
+                                  campaign=campaign)
             # history: one sample per new fleet observation; gaps only when stale
             self.history.record_fleet(snap, fl.observed_epoch, advanced=fl.obs_count != self._fleet_seen,
                                       stale=fleet_rec.state in ("stale", "unreachable") and (fl.age_s(now) is None or fl.age_s(now) > fl.stale_after_s), now=now)
